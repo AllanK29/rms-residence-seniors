@@ -2,372 +2,142 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zenao RMS - Pilotage National</title>
+  <title>RMS Dashboard - Appart'Hôtel</title>
+  <!-- Tailwind CSS pour le style visuel -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PapaParse pour lire le Google Sheet en CSV -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
-<body class="bg-slate-100 text-slate-800 p-4 md:p-8 font-sans">
+<body class="bg-slate-50 text-slate-800 p-6 md:p-10">
 
-  <div class="max-w-7xl mx-auto space-y-6">
-
-    <header class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+  <div class="max-w-6xl mx-auto space-y-6">
+    <!-- En-tête -->
+    <header class="flex justify-between items-center border-b pb-4">
       <div>
-        <div class="flex items-center gap-2">
-          <span class="bg-indigo-600 text-white font-black text-xs px-2.5 py-1 rounded">ZENAO</span>
-          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Stella Management × Nohée</span>
-        </div>
-        <h1 class="text-2xl font-bold text-slate-900 mt-1">Plateforme Nationale de Revenue Management</h1>
-        <p class="text-xs text-slate-500">Pilotage dynamique du stock résiduel appart'hôtel en résidences seniors</p>
+        <h1 class="text-2xl font-bold text-slate-900">Tableau de Bord Revenue Management</h1>
+        <p class="text-sm text-slate-500">Données synchronisées en direct avec Google Sheets</p>
       </div>
-      <button onclick="chargerDonnees()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-sm transition">
-        Actualiser les données
+      <button onclick="chargerDonnees()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow transition">
+        Actualiser
       </button>
     </header>
 
-    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div>
-        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Périmètre Marque</label>
-        <select id="filter-marque" onchange="appliquerFiltres()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500">
-          <option value="ALL">Toutes les marques (Réseau Total)</option>
-          <option value="Stella">Résidences Stella</option>
-          <option value="Nohée">Résidences Nohée</option>
-        </select>
+    <!-- Cartes KPI -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase">CA Total</span>
+        <div id="kpi-ca" class="text-2xl font-bold text-slate-900 mt-1">-- €</div>
       </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Région</label>
-        <select id="filter-region" onchange="appliquerFiltres()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500">
-          <option value="ALL">Toutes les régions</option>
-        </select>
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Taux d'Occupation (TO)</span>
+        <div id="kpi-to" class="text-2xl font-bold text-indigo-600 mt-1">-- %</div>
       </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Résidence spécifique</label>
-        <select id="filter-residence" onchange="appliquerFiltres()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500">
-          <option value="ALL">Toutes les résidences du périmètre</option>
-        </select>
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Prix Moyen (PM)</span>
+        <div id="kpi-pm" class="text-2xl font-bold text-slate-900 mt-1">-- €</div>
       </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Date d'analyse</label>
-        <select id="filter-date" onchange="appliquerFiltres()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500">
-          <option value="ALL">Toutes les dates consolidées</option>
-        </select>
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase">RevPAR</span>
+        <div id="kpi-revpar" class="text-2xl font-bold text-emerald-600 mt-1">-- €</div>
       </div>
     </div>
 
-    <div id="ai-box" class="bg-white p-6 rounded-2xl border-l-8 border-indigo-600 shadow-sm transition-all">
-      <div class="flex items-center gap-3">
-        <span id="ai-tag" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700">Analyse IA Active</span>
-        <h2 id="ai-title" class="text-lg font-bold text-slate-900">Calcul des recommandations en cours...</h2>
-      </div>
-      <p id="ai-desc" class="text-sm text-slate-600 mt-2">Le moteur synthétise les écarts N vs N-1, la vitesse de pickup et la compression du stock disponible pour suggérer la politique de yield optimale.</p>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-        <div>
-          <div class="flex justify-between items-center">
-            <span class="text-xs font-semibold text-slate-400 uppercase">Taux d'Occupation (TO)</span>
-            <span id="badge-to" class="text-xs font-bold px-2 py-0.5 rounded">--</span>
-          </div>
-          <div id="val-to" class="text-3xl font-bold text-slate-900 mt-2">-- %</div>
-        </div>
-        <div class="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100 flex justify-between">
-          <span>N-1 : <strong id="n1-to">-- %</strong></span>
-          <span id="detail-to" class="text-slate-400">Sur stock AH dispo</span>
-        </div>
-      </div>
-
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-        <div>
-          <div class="flex justify-between items-center">
-            <span class="text-xs font-semibold text-slate-400 uppercase">Prix Moyen (PM)</span>
-            <span id="badge-pm" class="text-xs font-bold px-2 py-0.5 rounded">--</span>
-          </div>
-          <div id="val-pm" class="text-3xl font-bold text-slate-900 mt-2">-- €</div>
-        </div>
-        <div class="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100 flex justify-between">
-          <span>N-1 : <strong id="n1-pm">-- €</strong></span>
-          <span class="text-slate-400">Chambre vendue</span>
-        </div>
-      </div>
-
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-        <div>
-          <div class="flex justify-between items-center">
-            <span class="text-xs font-semibold text-slate-400 uppercase">RevPAR</span>
-            <span id="badge-revpar" class="text-xs font-bold px-2 py-0.5 rounded">--</span>
-          </div>
-          <div id="val-revpar" class="text-3xl font-bold text-slate-900 mt-2">-- €</div>
-        </div>
-        <div class="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100 flex justify-between">
-          <span>N-1 : <strong id="n1-revpar">-- €</strong></span>
-          <span class="text-slate-400">Rendement unitaire</span>
-        </div>
-      </div>
-
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-        <div>
-          <div class="flex justify-between items-center">
-            <span class="text-xs font-semibold text-slate-400 uppercase">Pick-up (7 derniers jours)</span>
-            <span id="badge-pickup" class="text-xs font-bold px-2 py-0.5 rounded">--</span>
-          </div>
-          <div id="val-pickup" class="text-3xl font-bold text-slate-900 mt-2">-- rsv</div>
-        </div>
-        <div class="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100 flex justify-between">
-          <span>Part des ventes : <strong id="n1-pickup-ratio">-- %</strong></span>
-          <span class="text-slate-400">Vélocité</span>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-      <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-        <h3 class="font-bold text-slate-800">Synthèse d'exploitation et performance N vs N-1</h3>
-        <span id="table-count" class="text-xs text-slate-400">Affichage de -- lignes</span>
+    <!-- Tableau de données -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-4 border-b border-slate-100">
+        <h2 class="font-semibold text-slate-800">Détail journalier</h2>
       </div>
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs md:text-sm">
-          <thead class="bg-slate-50 text-slate-600 border-b">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-500 border-b">
             <tr>
-              <th class="p-3">Résidence</th>
-              <th class="p-3">Marque</th>
-              <th class="p-3">Région</th>
-              <th class="p-3 text-right">Dispo AH</th>
+              <th class="p-3">Date</th>
+              <th class="p-3">Hôtel</th>
+              <th class="p-3 text-right">Dispos</th>
               <th class="p-3 text-right">Louées</th>
-              <th class="p-3 text-right">Pick-up 7J</th>
-              <th class="p-3 text-right">TO Actuel</th>
-              <th class="p-3 text-right">TO N-1</th>
-              <th class="p-3 text-right">PM Actuel</th>
-              <th class="p-3 text-right">PM N-1</th>
+              <th class="p-3 text-right">TO</th>
+              <th class="p-3 text-right">PM</th>
               <th class="p-3 text-right">RevPAR</th>
-              <th class="p-3 text-right font-semibold">CA Brut</th>
+              <th class="p-3 text-right">CA</th>
             </tr>
           </thead>
           <tbody id="table-body" class="divide-y divide-slate-100">
             <tr>
-              <td colspan="12" class="p-6 text-center text-slate-400">Chargement des données...</td>
+              <td colspan="8" class="p-4 text-center text-slate-400">Chargement des données...</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-
   </div>
 
   <script>
-    // ID du nouveau Google Sheet V2 créé sur votre Drive
+    // ⚠️ REMPLACEZ CETTE VALEUR PAR L'ID DE VOTRE PROPRE FEUILLE GOOGLE SHEET :
     const SHEET_ID = "12ekO09L9P_lhEdLrzyba-gOo5p8B2CQpJAnO6l44_J4";
     const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
-
-    let toutesLesLignes = [];
 
     async function chargerDonnees() {
       Papa.parse(CSV_URL, {
         download: true,
         header: true,
         dynamicTyping: true,
-        skipEmptyLines: true,
         complete: function(results) {
-          toutesLesLignes = results.data.filter(r => r.Date && r.Residence);
-          remplirListesFiltres(toutesLesLignes);
-          appliquerFiltres();
+          const data = results.data.filter(row => row.Date); // ignore les lignes vides
+          calculerEtAfficher(data);
         },
         error: function(err) {
-          alert("Erreur de lecture du Google Sheet. Assurez-vous que le lien est en accès public 'Lecteur'.");
+          alert("Erreur lors de la lecture du Google Sheet. Vérifiez le partage public.");
         }
       });
     }
 
-    function remplirListesFiltres(data) {
-      const regions = [...new Set(data.map(d => d.Region).filter(Boolean))].sort();
-      const residences = [...new Set(data.map(d => d.Residence).filter(Boolean))].sort();
-      const dates = [...new Set(data.map(d => d.Date).filter(Boolean))].sort();
-
-      remplirSelect("filter-region", regions, "Toutes les régions");
-      remplirSelect("filter-residence", residences, "Toutes les résidences du périmètre");
-      remplirSelect("filter-date", dates, "Toutes les dates consolidées");
-    }
-
-    function remplirSelect(elementId, items, defaultLabel) {
-      const select = document.getElementById(elementId);
-      const currentVal = select.value;
-      select.innerHTML = `<option value="ALL">${defaultLabel}</option>`;
-      items.forEach(it => {
-        select.innerHTML += `<option value="${it}">${it}</option>`;
-      });
-      if (items.includes(currentVal)) select.value = currentVal;
-    }
-
-    function appliquerFiltres() {
-      const marque = document.getElementById("filter-marque").value;
-      const region = document.getElementById("filter-region").value;
-      const residence = document.getElementById("filter-residence").value;
-      const date = document.getElementById("filter-date").value;
-
-      const filtered = toutesLesLignes.filter(row => {
-        if (marque !== "ALL" && row.Marque !== marque) return false;
-        if (region !== "ALL" && row.Region !== region) return false;
-        if (residence !== "ALL" && row.Residence !== residence) return false;
-        if (date !== "ALL" && row.Date !== date) return false;
-        return true;
-      });
-
-      calculerEtAfficher(filtered);
-    }
-
     function calculerEtAfficher(data) {
-      document.getElementById("table-count").innerText = `Affichage de ${data.length} enregistrements`;
-
-      let sumDispoAH = 0;
-      let sumLoueesAH = 0;
-      let sumCABrut = 0;
-      let sumPickup = 0;
-
-      let sumDispoN1 = 0;
-      let sumLoueesN1 = 0;
-      let sumCAN1 = 0;
-
+      let totalCA = 0;
+      let totalDispos = 0;
+      let totalLouees = 0;
       const tbody = document.getElementById("table-body");
       tbody.innerHTML = "";
 
       data.forEach(row => {
-        const cap = Number(row.Capacite_Totale) || 0;
-        const seniorPerm = Number(row.Occ_Senior_Permanent) || 0;
-        const seniorTemp = Number(row.Occ_Senior_Temporaire) || 0;
-        const etud = Number(row.Occ_Etudiant_Civil) || 0;
-        const corp = Number(row.Occ_Corporate) || 0;
-        const louees = Number(row.Louees_Apparthotel) || 0;
-        const ca = Number(row.CA_Apparthotel_Brut) || 0;
-        const pickup = Number(row.Pickup_7J) || 0;
-        const loueesN1 = Number(row.Louees_N_1) || 0;
-        const caN1 = Number(row.CA_N_1) || 0;
+        const ca = Number(row.CA_Hebergement) || 0;
+        const dispos = Number(row.Chambres_Total) || 0;
+        const louees = Number(row.Chambres_Louees) || 0;
 
-        // Stock disponible appart'hôtel flottant
-        const occupesHorsAH = seniorPerm + seniorTemp + etud + corp;
-        const dispoAH = Math.max(1, cap - occupesHorsAH);
+        const to = dispos > 0 ? (louees / dispos) * 100 : 0;
+        const pm = louees > 0 ? ca / louees : 0;
+        const revpar = dispos > 0 ? ca / dispos : 0;
 
-        const toRow = (louees / dispoAH) * 100;
-        const toRowN1 = (loueesN1 / dispoAH) * 100;
-        const pmRow = louees > 0 ? ca / louees : 0;
-        const pmRowN1 = loueesN1 > 0 ? caN1 / loueesN1 : 0;
-        const revparRow = ca / dispoAH;
-
-        sumDispoAH += dispoAH;
-        sumLoueesAH += louees;
-        sumCABrut += ca;
-        sumPickup += pickup;
-
-        sumDispoN1 += dispoAH;
-        sumLoueesN1 += loueesN1;
-        sumCAN1 += caN1;
-
-        // Code couleur TO N vs N-1
-        const toDiff = toRow - toRowN1;
-        const toColor = toDiff >= 0 ? "text-emerald-600 font-semibold" : "text-rose-600 font-semibold";
+        totalCA += ca;
+        totalDispos += dispos;
+        totalLouees += louees;
 
         tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="p-3 font-semibold text-slate-800">${row.Residence}</td>
-            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs ${row.Marque === 'Stella' ? 'bg-amber-100 text-amber-800 font-medium' : 'bg-sky-100 text-sky-800 font-medium'}">${row.Marque}</span></td>
-            <td class="p-3 text-slate-600">${row.Region}</td>
-            <td class="p-3 text-right font-bold text-indigo-600 bg-indigo-50/40">${dispoAH}</td>
-            <td class="p-3 text-right font-medium">${louees}</td>
-            <td class="p-3 text-right font-semibold text-indigo-600">+${pickup}</td>
-            <td class="p-3 text-right ${toColor}">${toRow.toFixed(0)}%</td>
-            <td class="p-3 text-right text-slate-400">${toRowN1.toFixed(0)}%</td>
-            <td class="p-3 text-right font-medium">${pmRow.toFixed(1)} €</td>
-            <td class="p-3 text-right text-slate-400">${pmRowN1.toFixed(1)} €</td>
-            <td class="p-3 text-right font-semibold text-emerald-600">${revparRow.toFixed(1)} €</td>
-            <td class="p-3 text-right font-bold text-slate-900">${ca.toLocaleString('fr-FR')} €</td>
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-medium">${row.Date}</td>
+            <td class="p-3">${row.Hotel || '-'}</td>
+            <td class="p-3 text-right">${dispos}</td>
+            <td class="p-3 text-right">${louees}</td>
+            <td class="p-3 text-right font-medium text-indigo-600">${to.toFixed(1)}%</td>
+            <td class="p-3 text-right">${pm.toFixed(2)} €</td>
+            <td class="p-3 text-right font-medium text-emerald-600">${revpar.toFixed(2)} €</td>
+            <td class="p-3 text-right font-semibold">${ca.toLocaleString('fr-FR')} €</td>
           </tr>
         `;
       });
 
-      // Calculs globaux consolidés N vs N-1
-      const toActuel = sumDispoAH > 0 ? (sumLoueesAH / sumDispoAH) * 100 : 0;
-      const toN1 = sumDispoN1 > 0 ? (sumLoueesN1 / sumDispoN1) * 100 : 0;
-      const diffTO = toActuel - toN1;
+      // Calcul des moyennes globales
+      const toMoyen = totalDispos > 0 ? (totalLouees / totalDispos) * 100 : 0;
+      const pmMoyen = totalLouees > 0 ? totalCA / totalLouees : 0;
+      const revparMoyen = totalDispos > 0 ? totalCA / totalDispos : 0;
 
-      const pmActuel = sumLoueesAH > 0 ? sumCABrut / sumLoueesAH : 0;
-      const pmN1 = sumLoueesN1 > 0 ? sumCAN1 / sumLoueesN1 : 0;
-      const diffPM = pmActuel - pmN1;
-
-      const revparActuel = sumDispoAH > 0 ? sumCABrut / sumDispoAH : 0;
-      const revparN1 = sumDispoN1 > 0 ? sumCAN1 / sumDispoN1 : 0;
-      const diffRevpar = revparActuel - revparN1;
-
-      const pickupRatio = sumLoueesAH > 0 ? (sumPickup / sumLoueesAH) * 100 : 0;
-
-      // Affichage des valeurs
-      document.getElementById("val-to").innerText = toActuel.toFixed(1) + " %";
-      document.getElementById("n1-to").innerText = toN1.toFixed(1) + " %";
-      mettreAJourBadge("badge-to", diffTO, "pts", true);
-
-      document.getElementById("val-pm").innerText = pmActuel.toFixed(1) + " €";
-      document.getElementById("n1-pm").innerText = pmN1.toFixed(1) + " €";
-      mettreAJourBadge("badge-pm", diffPM, "€", false);
-
-      document.getElementById("val-revpar").innerText = revparActuel.toFixed(1) + " €";
-      document.getElementById("n1-revpar").innerText = revparN1.toFixed(1) + " €";
-      mettreAJourBadge("badge-revpar", diffRevpar, "€", false);
-
-      document.getElementById("val-pickup").innerText = "+" + sumPickup;
-      document.getElementById("n1-pickup-ratio").innerText = pickupRatio.toFixed(0) + " %";
-      mettreAJourBadge("badge-pickup", pickupRatio - 40, "% vélocité", false, `Vélocité ${pickupRatio >= 50 ? 'Forte' : 'Normale'}`);
-
-      // Déclenchement des règles IA
-      genererRecommandationIA(toActuel, diffTO, pmActuel, diffPM, revparActuel, sumDispoAH / (data.length || 1), pickupRatio);
+      // Mise à jour des cartes KPI
+      document.getElementById("kpi-ca").innerText = totalCA.toLocaleString('fr-FR') + " €";
+      document.getElementById("kpi-to").innerText = toMoyen.toFixed(1) + " %";
+      document.getElementById("kpi-pm").innerText = pmMoyen.toFixed(2) + " €";
+      document.getElementById("kpi-revpar").innerText = revparMoyen.toFixed(2) + " €";
     }
 
-    function mettreAJourBadge(elementId, difference, unite, isPoints, customText) {
-      const badge = document.getElementById(elementId);
-      const signe = difference > 0 ? "+" : "";
-      const texte = customText ? customText : `${signe}${difference.toFixed(1)} ${unite}`;
-
-      if (difference >= 0) {
-        badge.className = "text-xs font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800";
-        badge.innerText = texte;
-      } else {
-        badge.className = "text-xs font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-800";
-        badge.innerText = texte;
-      }
-    }
-
-    function genererRecommandationIA(to, diffTO, pm, diffPM, revpar, stockDispoMoyen, pickupRatio) {
-      const box = document.getElementById("ai-box");
-      const tag = document.getElementById("ai-tag");
-      const title = document.getElementById("ai-title");
-      const desc = document.getElementById("ai-desc");
-
-      if (stockDispoMoyen <= 4.5 && to >= 70) {
-        // Forte compression sur inventaire flottant
-        box.className = "bg-rose-50 p-6 rounded-2xl border-l-8 border-rose-500 shadow-sm transition-all";
-        tag.className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-200 text-rose-800";
-        tag.innerText = "Priorité au Prix Moyen (PM) & MLOS";
-        title.innerText = `Compression élevée (Stock résiduel critique : ~${stockDispoMoyen.toFixed(0)} apparts) ➔ Hausse de prix immédiate`;
-        desc.innerText = `Le périmètre affiche un TO supérieur à N-1 (+${diffTO.toFixed(1)} pts) avec un stock résiduel très comprimé. Recommandation IA : augmenter le tarif affiché de +15% à +25% sur les canaux OTA, fermer les tarifs promotionnels et imposer une durée minimale de 2 nuits (MLOS 2). Ne bradez pas le stock résiduel pour préserver le GOPAR et garder une marge d'accueil pour les séjours temporaires seniors.`;
-      } else if (to < 60 && diffTO < 0) {
-        // Retard de remplissage vs N-1
-        box.className = "bg-amber-50 p-6 rounded-2xl border-l-8 border-amber-500 shadow-sm transition-all";
-        tag.className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-200 text-amber-800";
-        tag.innerText = "Priorité au Volume (TO) & Déplacement d'inventaire";
-        title.innerText = `Retard d'occupation détecté (${diffTO.toFixed(1)} pts vs N-1) ➔ Action sur la demande`;
-        desc.innerText = `La vélocité de réservation est insuffisante pour absorber le stock résiduel. Recommandation IA : créer une offre flash sur le canal direct, assouplir les conditions d'annulation pour stimuler le pick-up, ou réallouer 2 à 3 logements en contrats d'entreprise (corporate) moyenne durée afin de sécuriser un socle de revenu récurrent net de frais de ménage.`;
-      } else {
-        // Situation de croissance saine
-        box.className = "bg-emerald-50 p-6 rounded-2xl border-l-8 border-emerald-500 shadow-sm transition-all";
-        tag.className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-200 text-emerald-800";
-        tag.innerText = "Stratégie de Rendement Optimal";
-        title.innerText = `Dynamique positive : RevPAR en progression (+${(revpar).toFixed(1)} €)`;
-        desc.innerText = `L'arbitrage entre volume et prix moyen est équilibré. Le pick-up des 7 derniers jours contribue sainement à l'occupation. Recommandation IA : privilégier le canal direct en réduisant la visibilité sur les OTA à fortes commissions pour maximiser la marge nette (GOPAR).`;
-      }
-    }
-
+    // Charger les données dès l'ouverture de la page
     window.onload = chargerDonnees;
   </script>
 </body>
