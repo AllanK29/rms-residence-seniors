@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RMS Résidences Seniors & Appart'Hôtel</title>
+  <!-- Framework CSS Tailwind pour l'interface -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Bibliothèque pour lire le Google Sheet en CSV instantanément -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 p-4 md:p-8 font-sans">
+
+  <div class="max-w-7xl mx-auto space-y-6">
+
+    <!-- En-tête -->
+    <header class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900">Dashboard Revenue Management Hybride</h1>
+        <p class="text-sm text-slate-500">Pilotage dynamique du stock résiduel appart'hôtel en résidence seniors</p>
+      </div>
+      <button onclick="chargerDonnees()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-sm transition">
+        Actualiser les données
+      </button>
+    </header>
+
+    <!-- Encart Recommandation Stratégique Automatique -->
+    <div id="decision-box" class="bg-white p-6 rounded-2xl border-l-8 border-slate-400 shadow-sm transition-all">
+      <div class="flex items-center gap-3">
+        <span id="decision-tag" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-700">Analyse en cours</span>
+        <h2 id="decision-title" class="text-lg font-bold text-slate-900">Calcul des règles d'arbitrage...</h2>
+      </div>
+      <p id="decision-desc" class="text-sm text-slate-600 mt-2">Le moteur analyse l'élasticité de votre stock et le coût d'opportunité.</p>
+    </div>
+
+    <!-- Cartes KPI Hybrides -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase">TO Résidence</span>
+        <div id="kpi-to-global" class="text-xl font-bold text-slate-900 mt-1">-- %</div>
+        <span class="text-[11px] text-slate-500">Occupation globale</span>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Stock Dispo AH</span>
+        <div id="kpi-dispo-ah" class="text-xl font-bold text-indigo-600 mt-1">--</div>
+        <span class="text-[11px] text-slate-500">Apparts résiduels</span>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase">TO Appart'Hôtel</span>
+        <div id="kpi-to-ah" class="text-xl font-bold text-blue-600 mt-1">-- %</div>
+        <span class="text-[11px] text-slate-500">Sur stock disponible</span>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Prix Moyen (PM)</span>
+        <div id="kpi-pm" class="text-xl font-bold text-slate-900 mt-1">-- €</div>
+        <span class="text-[11px] text-slate-500">Par nuit vendue</span>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase">RevPAR</span>
+        <div id="kpi-revpar" class="text-xl font-bold text-emerald-600 mt-1">-- €</div>
+        <span class="text-[11px] text-slate-500">Par appart dispo</span>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase">GOPAR Net</span>
+        <div id="kpi-gopar" class="text-xl font-bold text-amber-600 mt-1">-- €</div>
+        <span class="text-[11px] text-slate-500">Marge brute / dispo</span>
+      </div>
+    </div>
+
+    <!-- Tableau détaillé -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+        <h3 class="font-bold text-slate-800">Décomposition journalière des stocks et revenus</h3>
+        <span class="text-xs text-slate-400">Ordre chronologique</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs md:text-sm">
+          <thead class="bg-slate-50 text-slate-600 border-b">
+            <tr>
+              <th class="p-3">Date</th>
+              <th class="p-3">Résidence</th>
+              <th class="p-3 text-right">Capacité</th>
+              <th class="p-3 text-right">Seniors (Perm/Temp)</th>
+              <th class="p-3 text-right">Baux (Étud/Corp)</th>
+              <th class="p-3 text-right font-semibold text-indigo-700">Dispo AH</th>
+              <th class="p-3 text-right">Louées</th>
+              <th class="p-3 text-right">TO AH</th>
+              <th class="p-3 text-right">PM</th>
+              <th class="p-3 text-right">GOPAR</th>
+              <th class="p-3 text-right font-semibold">CA Brut</th>
+            </tr>
+          </thead>
+          <tbody id="table-body" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="11" class="p-6 text-center text-slate-400">Chargement de la feuille Google Sheet...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // =========================================================================
+    // ⚠️ COLLE ICI L'ID DE TON GOOGLE SHEET (entre les deux guillemets) :
+    const SHEET_ID = "1kp4wOLYg_6m0JXRVU6FE_nhID9R3HA0d";
+    // =========================================================================
+
+    const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Donnees`;
+
+    async function chargerDonnees() {
+      Papa.parse(CSV_URL, {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          const data = results.data.filter(row => row.Date);
+          if (data.length === 0) {
+            alert("Aucune donnée trouvée. Vérifie le nom de l'onglet 'Donnees' et le remplissage.");
+            return;
+          }
+          analyserDonnees(data);
+        },
+        error: function(err) {
+          alert("Erreur de connexion : vérifie que le document est bien partagé en 'Tous les utilisateurs disposant du lien' et que le SHEET_ID est exact.");
+        }
+      });
+    }
+
+    function analyserDonnees(data) {
+      let sumCapacite = 0;
+      let sumOccupesTotal = 0;
+      let sumDispoAH = 0;
+      let sumLoueesAH = 0;
+      let sumCABrut = 0;
+      let sumCoutsVariables = 0;
+
+      const tbody = document.getElementById("table-body");
+      tbody.innerHTML = "";
+
+      data.forEach(row => {
+        const capacite = Number(row.Capacite_Totale) || 0;
+        const seniorPerm = Number(row.Occ_Senior_Permanent) || 0;
+        const seniorTemp = Number(row.Occ_Senior_Temporaire) || 0;
+        const etudiantCivil = Number(row.Occ_Etudiant_Civil) || 0;
+        const corporate = Number(row.Occ_Corporate) || 0;
+        const loueesAH = Number(row.Louees_Apparthotel) || 0;
+        const caBrut = Number(row.CA_Apparthotel_Brut) || 0;
+        const coutsVar = Number(row.Couts_Variables_Jour) || 0;
+
+        // Calcul du stock résiduel ouvert au court séjour
+        const occupesHorsAH = seniorPerm + seniorTemp + etudiantCivil + corporate;
+        const dispoAH = Math.max(0, capacite - occupesHorsAH);
+
+        // Métriques
+        const toAH = dispoAH > 0 ? (loueesAH / dispoAH) * 100 : 0;
+        const pm = loueesAH > 0 ? caBrut / loueesAH : 0;
+        const gopar = dispoAH > 0 ? (caBrut - coutsVar) / dispoAH : 0;
+
+        // Cumuls
+        sumCapacite += capacite;
+        sumOccupesTotal += (occupesHorsAH + loueesAH);
+        sumDispoAH += dispoAH;
+        sumLoueesAH += loueesAH;
+        sumCABrut += caBrut;
+        sumCoutsVariables += coutsVar;
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3 font-medium">${row.Date}</td>
+            <td class="p-3">${row.Residence || '-'}</td>
+            <td class="p-3 text-right">${capacite}</td>
+            <td class="p-3 text-right">${seniorPerm} + ${seniorTemp}</td>
+            <td class="p-3 text-right">${etudiantCivil + corporate}</td>
+            <td class="p-3 text-right font-bold text-indigo-600 bg-indigo-50/50">${dispoAH}</td>
+            <td class="p-3 text-right font-semibold">${loueesAH}</td>
+            <td class="p-3 text-right">${toAH.toFixed(0)} %</td>
+            <td class="p-3 text-right">${pm.toFixed(1)} €</td>
+            <td class="p-3 text-right font-medium text-amber-600">${gopar.toFixed(1)} €</td>
+            <td class="p-3 text-right font-bold">${caBrut.toLocaleString('fr-FR')} €</td>
+          </tr>
+        `;
+      });
+
+      // Moyennes consolidées
+      const toGlobal = sumCapacite > 0 ? (sumOccupesTotal / sumCapacite) * 100 : 0;
+      const toAHMoyen = sumDispoAH > 0 ? (sumLoueesAH / sumDispoAH) * 100 : 0;
+      const pmMoyen = sumLoueesAH > 0 ? sumCABrut / sumLoueesAH : 0;
+      const revparMoyen = sumDispoAH > 0 ? sumCABrut / sumDispoAH : 0;
+      const goparMoyen = sumDispoAH > 0 ? (sumCABrut - sumCoutsVariables) / sumDispoAH : 0;
+
+      // Affichage des cartes KPI
+      document.getElementById("kpi-to-global").innerText = toGlobal.toFixed(1) + " %";
+      document.getElementById("kpi-dispo-ah").innerText = Math.round(sumDispoAH / data.length);
+      document.getElementById("kpi-to-ah").innerText = toAHMoyen.toFixed(1) + " %";
+      document.getElementById("kpi-pm").innerText = pmMoyen.toFixed(1) + " €";
+      document.getElementById("kpi-revpar").innerText = revparMoyen.toFixed(1) + " €";
+      document.getElementById("kpi-gopar").innerText = goparMoyen.toFixed(1) + " €";
+
+      // Moteur de recommandation stratégique
+      genererRecommandation(sumDispoAH / data.length, toAHMoyen, goparMoyen);
+    }
+
+    function genererRecommandation(stockDispoMoyen, toAH, gopar) {
+      const box = document.getElementById("decision-box");
+      const tag = document.getElementById("decision-tag");
+      const title = document.getElementById("decision-title");
+      const desc = document.getElementById("decision-desc");
+
+      if (stockDispoMoyen <= 4) {
+        // Cas 1 : Stock résiduel très rare (effet entonnoir)
+        box.className = "bg-rose-50 p-6 rounded-2xl border-l-8 border-rose-500 shadow-sm";
+        tag.className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-200 text-rose-800";
+        tag.innerText = "Priorité Absolue au Prix Moyen (PM)";
+        title.innerText = "Stock critique (" + stockDispoMoyen.toFixed(0) + " logements) : Hausse tarifaire agressive";
+        desc.innerText = "Le stock résiduel est trop faible pour brader. Monter les prix de +20% à +35%, imposer un séjour minimum de 2 nuits (MLOS 2) et refuser les promotions. Objectif : préserver le GOPAR et garder une flexibilité d'accueil pour un prospect senior permanent.";
+      } else if (stockDispoMoyen > 4 && toAH < 55) {
+        // Cas 2 : Stock important et demande atone
+        box.className = "bg-amber-50 p-6 rounded-2xl border-l-8 border-amber-500 shadow-sm";
+        tag.className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-200 text-amber-800";
+        tag.innerText = "Priorité au Volume (TO) ou Arbitrage Long Séjour";
+        title.innerText = "Sous-occupation appart'hôtel (" + toAH.toFixed(0) + "%) : Risque de perte de marge";
+        desc.innerText = "Trop de logements dorment sans générer de cash-flow. Deux leviers : soit baisser le prix d'appel court séjour sur les canaux directs, soit allouer 2 à 3 logements à des baux étudiants ou corporate moyenne durée pour sécuriser un revenu garanti sans coûts de rotation hôteliers.";
+      } else {
+        // Cas 3 : Situation saine / équilibrée
+        box.className = "bg-emerald-50 p-6 rounded-2xl border-l-8 border-emerald-500 shadow-sm";
+        tag.className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-200 text-emerald-800";
+        tag.innerText = "Stratégie de Rendement Équilibrée";
+        title.innerText = "Régime de croisière optimal (GOPAR : " + gopar.toFixed(1) + " € / dispo)";
+        desc.innerText = "Le taux de remplissage du stock tampon absorbe bien les charges. Maintenir la politique tarifaire actuelle et commencer à fermer les canaux OTA à forte commission au profit des réservations directes.";
+      }
+    }
+
+    window.onload = chargerDonnees;
+  </script>
+</body>
+</html>
