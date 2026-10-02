@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RMS Zénao - Système de Revenue Management Hybride</title>
-  <!-- Bibliothèques externes -->
+  <title>RMS Zénao - Système de Décision Hybride</title>
+  <!-- Bibliothèques graphiques & cartographiques -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -23,8 +23,8 @@
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm">Z</div>
           <div>
-            <span class="text-lg font-black text-slate-900 tracking-tight block">RMS Zénao Appart'Hôtel</span>
-            <span class="text-xs text-slate-500 font-medium">Modèle Hybride Résidences Seniors & Court Séjour</span>
+            <span class="text-lg font-black text-slate-900 tracking-tight block">RMS Zénao & Nohée • Mémoire Master</span>
+            <span class="text-xs text-slate-500 font-medium">Pilotage Hybride Résidences Seniors & Appart'Hôtel</span>
           </div>
         </div>
         <button onclick="chargerToutesLesDonnees()" class="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold px-3 py-2 rounded-xl transition">
@@ -32,13 +32,16 @@
         </button>
       </div>
 
-      <!-- Navigation entre onglets -->
+      <!-- Navigation à 3 onglets -->
       <div class="flex gap-6 text-sm overflow-x-auto">
         <button id="tab-btn-macro" onclick="changerOnglet('macro')" class="py-3 px-1 tab-active transition whitespace-nowrap">
-          1. Macro RM : Réseau, Cartographie & Filtres
+          1. Macro RM : Réseau & Cartographie
         </button>
         <button id="tab-btn-micro" onclick="changerOnglet('micro')" class="py-3 px-1 text-slate-500 hover:text-slate-700 transition whitespace-nowrap">
-          2. Micro RM : Arbitrage Résidence & IA Stratégique
+          2. Micro RM : Résidences & IA
+        </button>
+        <button id="tab-btn-contrat" onclick="changerOnglet('contrat')" class="py-3 px-1 text-slate-500 hover:text-slate-700 transition whitespace-nowrap">
+          3. Étude Contrat Longue Durée (Displacement)
         </button>
       </div>
     </div>
@@ -46,10 +49,12 @@
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <!-- ================= ONGLET 1 : MACRO RM ================= -->
+    <!-- ================================================================= -->
+    <!-- ONGLET 1 : MACRO RM (Réseau, Carte, Filtres & Graphiques Mensuels) -->
+    <!-- ================================================================= -->
     <div id="section-macro" class="space-y-6">
       
-      <!-- Filtres Réseau -->
+      <!-- Filtres -->
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
         <div class="flex flex-wrap gap-3 items-center">
           <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Filtrer par :</span>
@@ -77,7 +82,7 @@
         <div class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg" id="compteur-residences">47 résidences actives</div>
       </div>
 
-      <!-- KPI Macro Consolidés Nationaux -->
+      <!-- Chiffres Clés Réseau -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
           <span class="text-xs font-semibold text-slate-400 uppercase">CA Zénao Réseau 2026</span>
@@ -101,32 +106,34 @@
         </div>
       </div>
 
-      <!-- Carte Interactive Leaflet -->
+      <!-- Carte Interactive -->
       <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
         <div class="flex justify-between items-center">
-          <h3 class="font-bold text-slate-900 text-sm">Cartographie Stratégique du Réseau (Cliquez sur une pastille pour ouvrir sa fiche)</h3>
+          <h3 class="font-bold text-slate-900 text-sm">Cartographie du Réseau (Cliquez sur une pastille pour ouvrir sa fiche)</h3>
           <span class="text-xs text-slate-400">Pastille bleue = Établissement actif</span>
         </div>
-        <div id="map-france" style="height: 420px; width: 100%; border-radius: 1rem;" class="border border-slate-200"></div>
+        <div id="map-france" style="height: 400px; width: 100%; border-radius: 1rem;" class="border border-slate-200"></div>
       </div>
 
-      <!-- Graphiques Réseau 365 Jours -->
+      <!-- Graphiques Réseau Condensés par Mois -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <h3 class="font-bold text-slate-900 text-sm">Courbe Annuelle Réseau : Chiffre d'Affaires Journalier (2026 vs 2025)</h3>
+          <h3 class="font-bold text-slate-900 text-sm">Chiffre d'Affaires Mensuel Réseau (2026 vs 2025)</h3>
           <div class="relative h-64"><canvas id="chart-macro-ca"></canvas></div>
         </div>
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <h3 class="font-bold text-slate-900 text-sm">Volume de Nuitées Journalières Réseau (2026 vs 2025)</h3>
+          <h3 class="font-bold text-slate-900 text-sm">Volume de Nuitées Mensuelles Réseau (2026 vs 2025)</h3>
           <div class="relative h-64"><canvas id="chart-macro-nuits"></canvas></div>
         </div>
       </div>
     </div>
 
-    <!-- ================= ONGLET 2 : MICRO RM ================= -->
+    <!-- ================================================================= -->
+    <!-- ONGLET 2 : MICRO RM (Résidences, IA & Graphiques Mensuels du site) -->
+    <!-- ================================================================= -->
     <div id="section-micro" class="space-y-6 hidden">
       
-      <!-- Sélecteur de Résidence -->
+      <!-- Sélecteur Résidence -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
           <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Sélectionner un établissement :</label>
@@ -139,31 +146,29 @@
         </div>
       </div>
 
-      <!-- Métriques Hybrides (Seniors vs Zénao & GOPAR) -->
+      <!-- Métriques Hybrides -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <span class="text-xs font-bold uppercase tracking-wider text-slate-400">1. TO Senior (Cœur de métier)</span>
           <div id="res-to-senior" class="text-3xl font-black text-slate-900 mt-2">89,4 %</div>
-          <p class="text-xs text-slate-500 mt-1">Capacité totale du site : <strong id="res-cap-totale">-- lots</strong></p>
+          <p class="text-xs text-slate-500 mt-1">Capacité totale : <strong id="res-cap-totale">-- lots</strong></p>
         </div>
-
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">2. Stock Zénao Disponible à Date</span>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">2. Stock Zénao Dispo à date</span>
           <div id="res-dispo-zenao" class="text-3xl font-black text-blue-600 mt-2">-- apparts</div>
           <span id="res-statut-tension" class="inline-block mt-2 px-3 py-1 rounded-lg text-xs font-bold uppercase bg-slate-100">Calcul...</span>
         </div>
-
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <span class="text-xs font-bold uppercase tracking-wider text-slate-400">3. GOPAR Net / Nuit</span>
           <div id="res-gopar" class="text-3xl font-black text-emerald-600 mt-2">-- €</div>
-          <p class="text-xs text-slate-500 mt-1">Commissions & ménages déduits</p>
+          <p class="text-xs text-slate-500 mt-1">Marge nette commissions déduites</p>
         </div>
       </div>
 
-      <!-- Performances N vs N-1 Résidence Spécifique -->
+      <!-- Performances N vs N-1 Résidence -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <span class="text-xs font-semibold text-slate-400 uppercase">CA Zénao Réalisé</span>
+          <span class="text-xs font-semibold text-slate-400 uppercase">CA Zénao Annuel</span>
           <div id="res-ca-n" class="text-2xl font-black text-slate-900 mt-1">-- €</div>
           <div class="text-xs text-slate-400 mt-1">2025 : <strong id="res-ca-n1">-- €</strong> <span id="res-delta-ca" class="font-bold ml-1"></span></div>
         </div>
@@ -184,33 +189,123 @@
         </div>
       </div>
 
-      <!-- Graphiques Spécifiques Résidence (365 jours) -->
+      <!-- Graphiques Résidence Condensés par Mois -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <h3 class="font-bold text-slate-900 text-sm" id="titre-chart-res-ca">Évolution du CA (2026 vs 2025)</h3>
+          <h3 class="font-bold text-slate-900 text-sm" id="titre-chart-res-ca">Évolution Mensuelle du CA (2026 vs 2025)</h3>
           <div class="relative h-64"><canvas id="chart-res-ca"></canvas></div>
         </div>
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <h3 class="font-bold text-slate-900 text-sm" id="titre-chart-res-nuits">Nuitées par Jour (2026 vs 2025)</h3>
+          <h3 class="font-bold text-slate-900 text-sm" id="titre-chart-res-nuits">Nuitées Mensuelles Vendues (2026 vs 2025)</h3>
           <div class="relative h-64"><canvas id="chart-res-nuits"></canvas></div>
         </div>
       </div>
 
-      <!-- Diagnostic IA & MLOS -->
+      <!-- Consigne IA -->
       <div id="res-ai-box" class="bg-white p-6 rounded-2xl border-l-8 border-blue-600 shadow-sm space-y-2">
         <h4 id="res-ai-title" class="font-bold text-slate-900 text-base">Consigne Opérationnelle de Yield & MLOS</h4>
-        <p id="res-ai-text" class="text-sm text-slate-600 leading-relaxed">Sélectionnez une résidence pour charger son analyse...</p>
+        <p id="res-ai-text" class="text-sm text-slate-600 leading-relaxed">Chargement...</p>
       </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- ONGLET 3 : SIMULATEUR CONTRAT LONGUE DURÉE (DISPLACEMENT ANALYSIS) -->
+    <!-- ================================================================= -->
+    <div id="section-contrat" class="space-y-6 hidden">
+      
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+        <h2 class="text-lg font-black text-slate-900">Étude d'Arbitrage Contrat Longue Durée vs Appart'Hôtel</h2>
+        <p class="text-xs text-slate-500">
+          Ce simulateur de <em>Displacement Analysis</em> compare le bénéfice net d'un bail bloqué (corporate, étudiant ou relogement) par rapport aux revenus que ces appartements généreraient s'ils restaient ouverts sur Booking/Expedia.
+        </p>
+      </div>
+
+      <!-- Formulaire de paramétrage -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <h3 class="font-bold text-sm text-slate-800 uppercase tracking-wider">Paramètres du Contrat</h3>
+          
+          <div>
+            <label class="text-xs font-semibold text-slate-500 block mb-1">Résidence concernée :</label>
+            <select id="simu-residence" onchange="calculerSimulationContrat()" class="bg-slate-50 border border-slate-200 text-sm font-bold rounded-xl px-3 py-2 w-full"></select>
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-slate-500 block mb-1">Type de contrat :</label>
+            <select id="simu-type" class="bg-slate-50 border border-slate-200 text-sm font-bold rounded-xl px-3 py-2 w-full">
+              <option value="Corporate">Bail Entreprise / Corporate</option>
+              <option value="Etudiant">Bail Étudiant (9 mois)</option>
+              <option value="Civil">Bail Civil / Relogement Temporaire</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-slate-500 block mb-1">Nombre d'appartements réservés :</label>
+            <input type="number" id="simu-nb-apparts" value="3" min="1" max="20" onchange="calculerSimulationContrat()" class="bg-slate-50 border border-slate-200 text-sm font-bold rounded-xl px-3 py-2 w-full">
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-slate-500 block mb-1">Durée du contrat (en mois) :</label>
+            <input type="number" id="simu-duree" value="6" min="1" max="12" onchange="calculerSimulationContrat()" class="bg-slate-50 border border-slate-200 text-sm font-bold rounded-xl px-3 py-2 w-full">
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-slate-500 block mb-1">Loyer mensuel proposé (€ HT / appart) :</label>
+            <input type="number" id="simu-loyer" value="1150" step="50" onchange="calculerSimulationContrat()" class="bg-slate-50 border border-slate-200 text-sm font-bold rounded-xl px-3 py-2 w-full">
+          </div>
+        </div>
+
+        <!-- Résultats comparatifs -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Option A : Contrat Longue Durée -->
+            <div class="bg-blue-50 p-6 rounded-2xl border border-blue-200 space-y-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-blue-700">Option A : Contrat Longue Durée</span>
+              <div class="text-3xl font-black text-blue-900" id="simu-ca-contrat">-- €</div>
+              <div class="text-xs text-blue-700 space-y-1">
+                <div>• Risque de vacance : <strong>0 % (Paiement garanti)</strong></div>
+                <div>• Commission OTA : <strong>0 € (Vente directe)</strong></div>
+                <div>• Frais de rotation/ménage : <strong>Réduits au minimum</strong></div>
+              </div>
+              <div class="pt-2 border-t border-blue-200 text-xs font-bold text-blue-900">
+                Marge Nette Contrat : <span id="simu-net-contrat" class="text-base font-black">-- €</span>
+              </div>
+            </div>
+
+            <!-- Option B : Maintien en Court Séjour -->
+            <div class="bg-slate-100 p-6 rounded-2xl border border-slate-200 space-y-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Option B : Vente Court Séjour (OTA)</span>
+              <div class="text-3xl font-black text-slate-900" id="simu-ca-cs">-- €</div>
+              <div class="text-xs text-slate-600 space-y-1">
+                <div>• Commission distributeur estimée : <strong id="simu-comm-cs">-- €</strong> (17 %)</div>
+                <div>• Coût des ménages de rotation : <strong id="simu-menage-cs">-- €</strong></div>
+                <div>• TO moyen attendu : <strong id="simu-to-cs">-- %</strong></div>
+              </div>
+              <div class="pt-2 border-t border-slate-200 text-xs font-bold text-slate-900">
+                Marge Nette Court Séjour : <span id="simu-net-cs" class="text-base font-black">-- €</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Verdict de Yield & Recommandation -->
+          <div id="simu-verdict-box" class="p-6 rounded-2xl border-l-8 border-emerald-500 bg-white shadow-sm space-y-2">
+            <h4 id="simu-verdict-titre" class="font-black text-base text-slate-900">Verdict d'arbitrage : Calcul en cours...</h4>
+            <p id="simu-verdict-texte" class="text-sm text-slate-600 leading-relaxed"></p>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </main>
 
   <script>
-    // Identifiant de ton document Google Sheets converti
     const SHEET_ID = "1uOLfWZjWGecJVIndPIiIwDggArNRM--Ed5VRbut6mpE";
     const BASE_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=";
+    const MOIS_NOMS = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"];
 
-    // Référentiel complet des 47 résidences
     const RESIDENCES = {
       "Zenao Aix Carnot": { code: "ZAXC", sheet: "ZAXC - Catégories sélectionnées", marque: "Nohée", region: "PACA", cap: 95 },
       "Zenao Aix Rambot": { code: "ZAXR", sheet: "ZAXR - Catégories sélectionnées", marque: "Nohée", region: "PACA", cap: 90 },
@@ -261,55 +356,23 @@
       "Zénao Wintzenheim": { code: "ZWZN", sheet: "ZWZN - Catégories sélectionnées", marque: "Stella", region: "Grand Est", cap: 85 }
     };
 
-    // Coordonnées GPS pour la carte
     const COORDS = {
-      "Zenao Aix Carnot": [43.529, 5.452],
-      "Zenao Aix Rambot": [43.534, 5.460],
-      "Zenao Alfortville": [48.805, 2.421],
-      "Zenao Asnières-sur-Seine": [48.913, 2.287],
-      "Zenao Auteuil": [48.847, 2.261],
-      "Zenao Avignon": [43.935, 4.815],
-      "Zenao Beaucaire": [43.807, 4.643],
-      "Zenao Bénodet": [47.876, -4.113],
-      "Zenao Bezons": [48.927, 2.217],
-      "Zenao Boissy Saint Léger": [48.751, 2.511],
-      "Zenao Clichy": [48.904, 2.306],
-      "Zenao Issy-les-Moulineaux Médiathèque": [48.824, 2.273],
-      "Zenao Limoges": [45.833, 1.261],
-      "Zenao Lourdes": [43.095, -0.046],
-      "Zenao Lyon 7": [45.748, 4.846],
-      "Zenao Massy": [48.730, 2.271],
-      "Zenao Plaisir": [48.817, 1.954],
-      "Zenao Puteaux": [48.885, 2.238],
-      "Zenao Saint Mandé": [48.842, 2.418],
-      "Zenao Sainte soulle": [46.186, -1.011],
-      "Zenao Sèvres": [48.824, 2.211],
-      "Zenao Toulouse": [43.604, 1.444],
-      "Zenao Vichy": [46.127, 3.426],
-      "Zénao Anglet": [43.484, -1.517],
-      "Zénao Balma": [43.611, 1.499],
-      "Zénao Cenon": [44.858, -0.531],
-      "Zénao Challans": [46.847, -1.879],
-      "Zénao Châlons-en-Champagne": [48.956, 4.364],
-      "Zénao Cognac": [45.696, -0.329],
-      "Zénao Dijon": [47.322, 5.041],
-      "Zénao Le Raincy": [48.898, 2.523],
-      "Zénao Le Raincy Thiers": [48.894, 2.518],
-      "Zénao Macon": [46.307, 4.831],
-      "Zénao Marseille Prado": [43.280, 5.383],
-      "Zénao Montivilliers": [49.546, 0.191],
-      "Zénao Montreuil": [48.863, 2.443],
-      "Zénao Mulhouse": [47.750, 7.335],
-      "Zénao Orléans": [47.902, 1.909],
-      "Zénao Saint-Maur-des-Fossés": [48.802, 2.485],
-      "Zénao Strasbourg": [48.573, 7.752],
-      "Zénao Suresnes": [48.871, 2.223],
-      "Zénao Tours": [47.394, 0.684],
-      "Zénao Troyes": [48.297, 4.074],
-      "Zénao Villeneuve d'ascq": [50.623, 3.144],
-      "Zénao Villeneuve Loubet": [43.658, 7.122],
-      "Zénao Villeneuve-lès-Avignon": [43.966, 4.796],
-      "Zénao Wintzenheim": [48.073, 7.291]
+      "Zenao Aix Carnot": [43.529, 5.452], "Zenao Aix Rambot": [43.534, 5.460], "Zenao Alfortville": [48.805, 2.421],
+      "Zenao Asnières-sur-Seine": [48.913, 2.287], "Zenao Auteuil": [48.847, 2.261], "Zenao Avignon": [43.935, 4.815],
+      "Zenao Beaucaire": [43.807, 4.643], "Zenao Bénodet": [47.876, -4.113], "Zenao Bezons": [48.927, 2.217],
+      "Zenao Boissy Saint Léger": [48.751, 2.511], "Zenao Clichy": [48.904, 2.306], "Zenao Issy-les-Moulineaux Médiathèque": [48.824, 2.273],
+      "Zenao Limoges": [45.833, 1.261], "Zenao Lourdes": [43.095, -0.046], "Zenao Lyon 7": [45.748, 4.846],
+      "Zenao Massy": [48.730, 2.271], "Zenao Plaisir": [48.817, 1.954], "Zenao Puteaux": [48.885, 2.238],
+      "Zenao Saint Mandé": [48.842, 2.418], "Zenao Sainte soulle": [46.186, -1.011], "Zenao Sèvres": [48.824, 2.211],
+      "Zenao Toulouse": [43.604, 1.444], "Zenao Vichy": [46.127, 3.426], "Zénao Anglet": [43.484, -1.517],
+      "Zénao Balma": [43.611, 1.499], "Zénao Cenon": [44.858, -0.531], "Zénao Challans": [46.847, -1.879],
+      "Zénao Châlons-en-Champagne": [48.956, 4.364], "Zénao Cognac": [45.696, -0.329], "Zénao Dijon": [47.322, 5.041],
+      "Zénao Le Raincy": [48.898, 2.523], "Zénao Le Raincy Thiers": [48.894, 2.518], "Zénao Macon": [46.307, 4.831],
+      "Zénao Marseille Prado": [43.280, 5.383], "Zénao Montivilliers": [49.546, 0.191], "Zénao Montreuil": [48.863, 2.443],
+      "Zénao Mulhouse": [47.750, 7.335], "Zénao Orléans": [47.902, 1.909], "Zénao Saint-Maur-des-Fossés": [48.802, 2.485],
+      "Zénao Strasbourg": [48.573, 7.752], "Zénao Suresnes": [48.871, 2.223], "Zénao Tours": [47.394, 0.684],
+      "Zénao Troyes": [48.297, 4.074], "Zénao Villeneuve d'ascq": [50.623, 3.144], "Zénao Villeneuve Loubet": [43.658, 7.122],
+      "Zénao Villeneuve-lès-Avignon": [43.966, 4.796], "Zénao Wintzenheim": [48.073, 7.291]
     };
 
     let mapInstance = null;
@@ -317,6 +380,8 @@
     let chartMacroNuits = null;
     let chartResCA = null;
     let chartResNuits = null;
+
+    let donneesResidenceCourante = { adr: 75, to: 65, nuits: 0, ca: 0 };
 
     function parseNum(val) {
       if (val === null || val === undefined || val === '') return 0;
@@ -326,53 +391,73 @@
       return isNaN(n) ? 0 : n;
     }
 
+    // Fonction d'agrégation 365 jours -> 12 mois
+    function agregerMois(dates, ca26, ca25, nuits26, nuits25) {
+      const c26 = new Array(12).fill(0);
+      const c25 = new Array(12).fill(0);
+      const n26 = new Array(12).fill(0);
+      const n25 = new Array(12).fill(0);
+
+      for (let i = 0; i < dates.length; i++) {
+        const d = String(dates[i]);
+        let mIdx = -1;
+        if (d.includes('-')) {
+          mIdx = parseInt(d.split('-')[1], 10) - 1;
+        } else if (d.includes('/')) {
+          mIdx = parseInt(d.split('/')[1], 10) - 1;
+        }
+        if (mIdx >= 0 && mIdx < 12) {
+          c26[mIdx] += ca26[i] || 0;
+          c25[mIdx] += ca25[i] || 0;
+          n26[mIdx] += nuits26[i] || 0;
+          n25[mIdx] += nuits25[i] || 0;
+        }
+      }
+
+      return {
+        labels: MOIS_NOMS,
+        ca26: c26.map(v => Math.round(v)),
+        ca25: c25.map(v => Math.round(v)),
+        nuits26: n26.map(v => Math.round(v)),
+        nuits25: n25.map(v => Math.round(v))
+      };
+    }
+
     function changerOnglet(onglet) {
-      document.getElementById('tab-btn-macro').className = (onglet === 'macro') 
-        ? 'py-3 px-1 tab-active transition whitespace-nowrap' 
-        : 'py-3 px-1 text-slate-500 hover:text-slate-700 transition whitespace-nowrap';
-      document.getElementById('tab-btn-micro').className = (onglet === 'micro') 
-        ? 'py-3 px-1 tab-active transition whitespace-nowrap' 
-        : 'py-3 px-1 text-slate-500 hover:text-slate-700 transition whitespace-nowrap';
-      
-      document.getElementById('section-macro').classList.toggle('hidden', onglet !== 'macro');
-      document.getElementById('section-micro').classList.toggle('hidden', onglet !== 'micro');
-      
+      ['macro', 'micro', 'contrat'].forEach(t => {
+        const btn = document.getElementById('tab-btn-' + t);
+        const sec = document.getElementById('section-' + t);
+        if (btn) btn.className = (t === onglet) ? 'py-3 px-1 tab-active transition whitespace-nowrap' : 'py-3 px-1 text-slate-500 hover:text-slate-700 transition whitespace-nowrap';
+        if (sec) sec.classList.toggle('hidden', t !== onglet);
+      });
+
       if (onglet === 'macro' && mapInstance) {
         setTimeout(() => { mapInstance.invalidateSize(); }, 200);
       }
       if (onglet === 'micro' && !chartResCA) {
         chargerDonneesResidence();
       }
+      if (onglet === 'contrat') {
+        calculerSimulationContrat();
+      }
     }
 
     async function chargerToutesLesDonnees() {
-      initSelecteur();
+      initSelecteurs();
       initCarte();
       chargerDonneesNationales();
       chargerDonneesResidence();
     }
 
     function initCarte() {
-      const container = document.getElementById('map-france');
-      if (!container) return;
-
       if (mapInstance) {
         mapInstance.remove();
         mapInstance = null;
       }
-      
       mapInstance = L.map('map-france').setView([46.7, 2.5], 5.8);
-      
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap'
-      }).addTo(mapInstance);
-
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(mapInstance);
       filtrerReseau();
-
-      setTimeout(() => {
-        if (mapInstance) mapInstance.invalidateSize();
-      }, 300);
+      setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 300);
     }
 
     function filtrerReseau() {
@@ -410,6 +495,7 @@
       chargerDonneesResidence();
     }
 
+    // 1. DONNÉES MACRO
     function chargerDonneesNationales() {
       const urlNational = BASE_URL + encodeURIComponent('Total - Catégories sélectionnée');
       
@@ -450,7 +536,8 @@
             document.getElementById('kpi-macro-revpar-n1').innerText = r25.toFixed(2) + ' €';
           }
 
-          tracerGraphiquesMacro(dates, ca26, ca25, nuits26, nuits25);
+          const m = agregerMois(dates, ca26, ca25, nuits26, nuits25);
+          tracerGraphiquesMacroMensuels(m);
         }
       });
     }
@@ -463,15 +550,15 @@
       el.className = d >= 0 ? 'text-emerald-600 font-bold ml-1' : 'text-rose-600 font-bold ml-1';
     }
 
-    function tracerGraphiquesMacro(dates, ca26, ca25, nuits26, nuits25) {
+    function tracerGraphiquesMacroMensuels(m) {
       if (chartMacroCA) chartMacroCA.destroy();
       chartMacroCA = new Chart(document.getElementById('chart-macro-ca'), {
-        type: 'line',
+        type: 'bar',
         data: {
-          labels: dates,
+          labels: m.labels,
           datasets: [
-            { label: 'CA Réseau 2026 (€)', data: ca26, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.06)', fill: true, tension: 0.1 },
-            { label: 'CA Réseau 2025 (€)', data: ca25, borderColor: '#94a3b8', borderDash: [4, 4], fill: false, tension: 0.1 }
+            { label: 'CA Réseau 2026 (€)', data: m.ca26, backgroundColor: '#2563eb', borderRadius: 4 },
+            { label: 'CA Réseau 2025 (€)', data: m.ca25, backgroundColor: '#94a3b8', borderRadius: 4 }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false }
@@ -481,16 +568,17 @@
       chartMacroNuits = new Chart(document.getElementById('chart-macro-nuits'), {
         type: 'bar',
         data: {
-          labels: dates,
+          labels: m.labels,
           datasets: [
-            { label: 'Nuitées 2026', data: nuits26, backgroundColor: '#4f46e5', borderRadius: 2 },
-            { label: 'Nuitées 2025', data: nuits25, backgroundColor: '#cbd5e1', borderRadius: 2 }
+            { label: 'Nuitées 2026', data: m.nuits26, backgroundColor: '#4f46e5', borderRadius: 4 },
+            { label: 'Nuitées 2025', data: m.nuits25, backgroundColor: '#cbd5e1', borderRadius: 4 }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false }
       });
     }
 
+    // 2. DONNÉES MICRO (RÉSIDENCE)
     function chargerDonneesResidence() {
       const select = document.getElementById('select-residence');
       if (!select || !select.value) return;
@@ -529,6 +617,13 @@
           if (totalRow) {
             const c26 = parseNum(totalRow[2]), p26 = parseNum(totalRow[3]), n26 = parseNum(totalRow[5]), r26 = parseNum(totalRow[6]);
             const c25 = parseNum(totalRow[16]), p25 = parseNum(totalRow[17]), n25 = parseNum(totalRow[19]), r25 = parseNum(totalRow[20]);
+
+            donneesResidenceCourante = {
+              adr: p26 > 0 ? p26 : 75,
+              to: parseNum(totalRow[4]) > 0 ? parseNum(totalRow[4]) : 65,
+              nuits: n26,
+              ca: c26
+            };
 
             document.getElementById('res-ca-n').innerText = Math.round(c26).toLocaleString('fr-FR') + ' €';
             document.getElementById('res-ca-n1').innerText = Math.round(c25).toLocaleString('fr-FR') + ' €';
@@ -581,22 +676,24 @@
             }
           }
 
-          document.getElementById('titre-chart-res-ca').innerText = nom + ' : Évolution CA (2026 vs 2025)';
-          document.getElementById('titre-chart-res-nuits').innerText = nom + ' : Nuitées par Jour (2026 vs 2025)';
-          tracerGraphiquesResidence(dates, ca26, ca25, nuits26, nuits25);
+          document.getElementById('titre-chart-res-ca').innerText = nom + ' : CA Mensuel 2026 vs 2025';
+          document.getElementById('titre-chart-res-nuits').innerText = nom + ' : Nuitées Mensuelles 2026 vs 2025';
+
+          const mRes = agregerMois(dates, ca26, ca25, nuits26, nuits25);
+          tracerGraphiquesResidenceMensuels(mRes);
         }
       });
     }
 
-    function tracerGraphiquesResidence(dates, ca26, ca25, nuits26, nuits25) {
+    function tracerGraphiquesResidenceMensuels(m) {
       if (chartResCA) chartResCA.destroy();
       chartResCA = new Chart(document.getElementById('chart-res-ca'), {
-        type: 'line',
+        type: 'bar',
         data: {
-          labels: dates,
+          labels: m.labels,
           datasets: [
-            { label: 'CA 2026 (€)', data: ca26, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.08)', fill: true, tension: 0.1 },
-            { label: 'CA 2025 (€)', data: ca25, borderColor: '#94a3b8', borderDash: [4, 4], fill: false, tension: 0.1 }
+            { label: 'CA 2026 (€)', data: m.ca26, backgroundColor: '#2563eb', borderRadius: 4 },
+            { label: 'CA 2025 (€)', data: m.ca25, backgroundColor: '#94a3b8', borderRadius: 4 }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false }
@@ -606,29 +703,93 @@
       chartResNuits = new Chart(document.getElementById('chart-res-nuits'), {
         type: 'bar',
         data: {
-          labels: dates,
+          labels: m.labels,
           datasets: [
-            { label: 'Nuitées 2026', data: nuits26, backgroundColor: '#4f46e5', borderRadius: 2 },
-            { label: 'Nuitées 2025', data: nuits25, backgroundColor: '#cbd5e1', borderRadius: 2 }
+            { label: 'Nuitées 2026', data: m.nuits26, backgroundColor: '#4f46e5', borderRadius: 4 },
+            { label: 'Nuitées 2025', data: m.nuits25, backgroundColor: '#cbd5e1', borderRadius: 4 }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false }
       });
     }
 
-    function initSelecteur() {
-      const select = document.getElementById('select-residence');
-      if (!select) return;
-      select.innerHTML = '';
+    // 3. SIMULATEUR DISPLACEMENT ANALYSIS (LONGUE DURÉE)
+    function calculerSimulationContrat() {
+      const nom = document.getElementById('simu-residence').value || Object.keys(RESIDENCES)[0];
+      const nbApparts = parseInt(document.getElementById('simu-nb-apparts').value, 10) || 1;
+      const dureeMois = parseInt(document.getElementById('simu-duree').value, 10) || 1;
+      const loyerMensuel = parseFloat(document.getElementById('simu-loyer').value) || 1000;
+
+      // Option A : Contrat Longue Durée
+      const caBrutContrat = nbApparts * loyerMensuel * dureeMois;
+      const fraisContrat = nbApparts * dureeMois * 35; // 35€/mois de ménage de contrôle
+      const margeNetteContrat = caBrutContrat - fraisContrat;
+
+      document.getElementById('simu-ca-contrat').innerText = Math.round(caBrutContrat).toLocaleString('fr-FR') + ' €';
+      document.getElementById('simu-net-contrat').innerText = Math.round(margeNetteContrat).toLocaleString('fr-FR') + ' €';
+
+      // Option B : Court Séjour Équivalent
+      const adr = donneesResidenceCourante.adr || 75;
+      const to = Math.min(95, Math.max(40, donneesResidenceCourante.to || 65));
+      const nuitsTheoriques = nbApparts * (dureeMois * 30.5);
+      const nuitsLoueesCS = nuitsTheoriques * (to / 100);
+
+      const caBrutCS = nuitsLoueesCS * adr;
+      const commOTA = caBrutCS * 0.17; // 17% commission Booking/Expedia
+      const fraisMenageCS = (nuitsLoueesCS / 3) * 22; // rotation tous les 3 jours, 22€ le ménage
+      const margeNetteCS = caBrutCS - commOTA - fraisMenageCS;
+
+      document.getElementById('simu-ca-cs').innerText = Math.round(caBrutCS).toLocaleString('fr-FR') + ' €';
+      document.getElementById('simu-comm-cs').innerText = Math.round(commOTA).toLocaleString('fr-FR') + ' €';
+      document.getElementById('simu-menage-cs').innerText = Math.round(fraisMenageCS).toLocaleString('fr-FR') + ' €';
+      document.getElementById('simu-to-cs').innerText = Math.round(to) + ' %';
+      document.getElementById('simu-net-cs').innerText = Math.round(margeNetteCS).toLocaleString('fr-FR') + ' €';
+
+      // Arbitrage & Verdict
+      const diff = margeNetteContrat - margeNetteCS;
+      const box = document.getElementById('simu-verdict-box');
+      const titre = document.getElementById('simu-verdict-titre');
+      const texte = document.getElementById('simu-verdict-texte');
+
+      if (diff >= 0) {
+        box.className = 'p-6 rounded-2xl border-l-8 border-emerald-500 bg-emerald-50/50 shadow-sm space-y-2';
+        titre.innerText = 'CONTRAT RECOMMANDÉ (+ ' + Math.round(diff).toLocaleString('fr-FR') + ' € de gain net)';
+        titre.className = 'font-black text-base text-emerald-800';
+        texte.innerText = 'La marge nette du contrat longue durée est supérieure à la vente court séjour après déduction des commissions OTA (17 %) et des coûts de ménage. Ce contrat supprime à 100 % le risque de vacance locative.';
+      } else if (Math.abs(diff) < caBrutContrat * 0.08) {
+        box.className = 'p-6 rounded-2xl border-l-8 border-amber-500 bg-amber-50/50 shadow-sm space-y-2';
+        titre.innerText = 'ARBITRAGE DE SÉCURISATION (Écart minime : -' + Math.round(Math.abs(diff)).toLocaleString('fr-FR') + ' €)';
+        titre.className = 'font-black text-base text-amber-800';
+        texte.innerText = 'Le court séjour est légèrement plus rémunérateur sur le papier, mais le contrat longue durée apporte une trésorerie 100 % garantie. Recommandé en période de basse ou moyenne saison.';
+      } else {
+        box.className = 'p-6 rounded-2xl border-l-8 border-rose-500 bg-rose-50/50 shadow-sm space-y-2';
+        titre.innerText = 'REFUSER OU RENÉGOCIER LE PRIX (- ' + Math.round(Math.abs(diff)).toLocaleString('fr-FR') + ' € de manque à gagner)';
+        titre.className = 'font-black text-base text-rose-800';
+        texte.innerText = 'Le loyer proposé est trop bas par rapport au potentiel court séjour de cet établissement. Recommandation : exiger un loyer mensuel d\'au moins ' + Math.round((margeNetteCS + fraisContrat) / (nbApparts * dureeMois)).toLocaleString('fr-FR') + ' € HT pour compenser le déplacement d\'activité.';
+      }
+    }
+
+    function initSelecteurs() {
+      const selectRes = document.getElementById('select-residence');
+      const selectSimu = document.getElementById('simu-residence');
+      if (!selectRes || !selectSimu) return;
+
+      selectRes.innerHTML = '';
+      selectSimu.innerHTML = '';
+
       Object.keys(RESIDENCES).sort().forEach(nom => {
-        const opt = document.createElement('option');
-        opt.value = nom;
-        opt.innerText = nom + ' (' + RESIDENCES[nom].marque + ' - ' + RESIDENCES[nom].region + ')';
-        select.appendChild(opt);
+        const opt1 = document.createElement('option');
+        opt1.value = nom;
+        opt1.innerText = nom + ' (' + RESIDENCES[nom].marque + ' - ' + RESIDENCES[nom].region + ')';
+        selectRes.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = nom;
+        opt2.innerText = nom;
+        selectSimu.appendChild(opt2);
       });
     }
 
-    // Lancement au chargement complet de la page
     window.onload = function() {
       chargerToutesLesDonnees();
     };
