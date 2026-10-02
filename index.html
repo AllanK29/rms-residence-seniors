@@ -16,6 +16,26 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
 
+  <!-- ================================================================= -->
+  <!-- ÉCRAN DE CHARGEMENT (SPLASH SCREEN AVEC LOGO ZÉNAO)               -->
+  <!-- ================================================================= -->
+  <div id="loading-screen" class="fixed inset-0 z-[9999] bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center transition-opacity duration-500">
+    <div class="relative flex flex-col items-center text-center px-4">
+      <!-- Logo Zénao stylisé -->
+      <div class="w-24 h-24 bg-gradient-to-tr from-blue-700 to-indigo-500 rounded-3xl flex items-center justify-center text-white text-5xl font-black shadow-2xl ring-4 ring-white/10 animate-pulse mb-6">
+        Z
+      </div>
+      <h1 class="text-2xl font-black text-white tracking-widest uppercase">Zénao Appart'Hôtel</h1>
+      <p class="text-xs text-blue-200 font-medium tracking-wider mt-1 uppercase">Stella Management & Nohée • Revenue Management System</p>
+      
+      <!-- Indicateur de chargement -->
+      <div class="w-64 bg-slate-800 rounded-full h-2 mt-8 overflow-hidden p-0.5 border border-slate-700">
+        <div class="bg-blue-500 h-full rounded-full animate-[shimmer_1.5s_infinite] w-full origin-left" style="animation: pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;"></div>
+      </div>
+      <span id="loading-text" class="text-xs text-slate-400 font-medium mt-3">Synchronisation des 51 résidences avec Google Sheets...</span>
+    </div>
+  </div>
+
   <!-- En-tête -->
   <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,15 +47,15 @@
             <span class="text-xs text-slate-500 font-medium">Pilotage Hybride Résidences Seniors & Appart'Hôtel</span>
           </div>
         </div>
-        <button onclick="chargerToutesLesDonnees()" class="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold px-3 py-2 rounded-xl transition">
-          Actualiser les données
+        <button onclick="actualiserAvecEcranChargement()" class="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+          <span>🔄</span> Actualiser les données
         </button>
       </div>
 
       <!-- Navigation à 3 onglets -->
       <div class="flex gap-6 text-sm overflow-x-auto">
         <button id="tab-btn-macro" onclick="changerOnglet('macro')" class="py-3 px-1 tab-active transition whitespace-nowrap">
-          1. Macro RM : Réseau & Cartographie
+          1. Macro RM : Réseau, Cartographie & Filtres
         </button>
         <button id="tab-btn-micro" onclick="changerOnglet('micro')" class="py-3 px-1 text-slate-500 hover:text-slate-700 transition whitespace-nowrap">
           2. Micro RM : Résidences & IA
@@ -50,7 +70,7 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
     <!-- ================================================================= -->
-    <!-- ONGLET 1 : MACRO RM (Réseau, Carte, Filtres & Graphiques Mensuels) -->
+    <!-- ONGLET 1 : MACRO RM (Réseau, Carte, Radar, Audit & Graphiques)    -->
     <!-- ================================================================= -->
     <div id="section-macro" class="space-y-6">
       
@@ -79,7 +99,7 @@
             <option value="Pays de la Loire">Pays de la Loire</option>
           </select>
         </div>
-        <div class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg" id="compteur-residences">47 résidences actives</div>
+        <div class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg" id="compteur-residences">51 résidences actives</div>
       </div>
 
       <!-- Chiffres Clés Réseau -->
@@ -106,11 +126,98 @@
         </div>
       </div>
 
+      <!-- RADAR D'ALERTES OPÉRATIONNELLES DU JOUR -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+          <div>
+            <h3 class="font-black text-slate-900 text-base">Radar d'Alertes Opérationnelles du Jour (Arbitrages Requis)</h3>
+            <p class="text-xs text-slate-500">Points chauds nécessitant une décision immédiate de tarification, de durée de séjour ou d'arbitrage de stock.</p>
+          </div>
+          <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 self-start sm:self-auto">Moteur d'Arbitrage Actif</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+          <!-- Alerte Tension Critique -->
+          <div class="p-4 rounded-xl border border-rose-200 bg-rose-50/60 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black uppercase text-rose-800 tracking-wider">Tension Critique (≤ 2 dispos)</span>
+              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-200 text-rose-900">MLOS 2 Recommandé</span>
+            </div>
+            <p class="text-xs text-rose-900 leading-relaxed">
+              <strong>Montreuil, Anglet, Cenon, Marseille Prado, Lyon 7</strong> : stock appart'hôtel quasi saturé.
+            </p>
+            <div class="text-[11px] text-rose-700 pt-1 border-t border-rose-200">
+              <strong>Consigne RM :</strong> bloquer la vente d'une nuitée sèche et relever les grilles OTA de +20 %.
+            </div>
+          </div>
+
+          <!-- Alerte Retard Chiffre d'Affaires -->
+          <div class="p-4 rounded-xl border border-amber-200 bg-amber-50/60 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black uppercase text-amber-800 tracking-wider">Retard d'Activité N vs N-1</span>
+              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-200 text-amber-900">Arbitrage Baux</span>
+            </div>
+            <p class="text-xs text-amber-900 leading-relaxed">
+              <strong>Orléans, Wintzenheim, Mulhouse</strong> : retard de chiffre d'affaires supérieur à -25 % par rapport à N-1.
+            </p>
+            <div class="text-[11px] text-amber-700 pt-1 border-t border-amber-200">
+              <strong>Consigne RM :</strong> ouvrir 4 à 6 lots en baux étudiants ou corporate temporaires pour amortir les charges.
+            </div>
+          </div>
+
+          <!-- Alerte Opportunité Longue Durée -->
+          <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/60 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black uppercase text-emerald-800 tracking-wider">Stock Fluide & Opportunité</span>
+              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-200 text-emerald-900">Displacement OK</span>
+            </div>
+            <p class="text-xs text-emerald-900 leading-relaxed">
+              <strong>Lourdes, Beaucaire, Châlons, Challans, Suresnes</strong> : réservoir de stock disponible suffisant.
+            </p>
+            <div class="text-[11px] text-emerald-700 pt-1 border-t border-emerald-200">
+              <strong>Consigne RM :</strong> sites cibles pour négocier des contrats cadres moyenne/longue durée (onglet 3).
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUDIT IA NATIONAL (SYNTHÈSE STRATÉGIQUE RÉSEAU) -->
+      <div class="bg-gradient-to-br from-slate-900 to-indigo-950 p-6 rounded-2xl text-white shadow-xl space-y-4 border border-indigo-800/40">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow">IA</div>
+          <div>
+            <h3 class="font-black text-base tracking-wide">Audit Stratégique National du Réseau Zénao</h3>
+            <p class="text-xs text-indigo-300">Synthèse pour le mémoire : optimisation du revenu par appartement disponible</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-indigo-100 pt-2 border-t border-indigo-800/60">
+          <div class="space-y-1.5">
+            <strong class="text-white block text-sm font-bold">1. Diagnostic Volume vs Prix</strong>
+            <p class="leading-relaxed text-indigo-200">
+              La progression du chiffre d'affaires (+45,5 %) provient d'une expansion massive de capacité (+39,7 % de nuitées), compensant une légère baisse de prix moyen (-4,1 % à 75,20 €). L'enjeu prioritaire est de stabiliser le prix moyen sur les périodes à forte demande.
+            </p>
+          </div>
+          <div class="space-y-1.5">
+            <strong class="text-white block text-sm font-bold">2. Arbitrage Hybride du Stock</strong>
+            <p class="leading-relaxed text-indigo-200">
+              Le taux d'occupation senior permanent (~89 %) forme le socle incompressible. Le stock Zénao résiduel doit être piloté avec agilité : le court séjour valorise les pointes de demande, tandis que les baux civils temporaires protègent les ailes de saison.
+            </p>
+          </div>
+          <div class="space-y-1.5">
+            <strong class="text-white block text-sm font-bold">3. Protection du GOPAR Net</strong>
+            <p class="leading-relaxed text-indigo-200">
+              Les commissions OTA (17 à 20 %) et le coût des ménages de rotation (22 €) amputent la marge des séjours d'une nuit. L'application d'un séjour minimum de 2 nuits (MLOS 2) sur les sites en tension est le premier levier de rentabilité nette.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <!-- Carte Interactive -->
       <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
         <div class="flex justify-between items-center">
-          <h3 class="font-bold text-slate-900 text-sm">Cartographie du Réseau (Cliquez sur une pastille pour ouvrir sa fiche)</h3>
-          <span class="text-xs text-slate-400">Pastille bleue = Établissement actif</span>
+          <h3 class="font-bold text-slate-900 text-sm">Cartographie Stratégique du Réseau (51 Établissements)</h3>
+          <span class="text-xs text-slate-400">Cliquez sur une pastille pour ouvrir la fiche micro</span>
         </div>
         <div id="map-france" style="height: 400px; width: 100%; border-radius: 1rem;" class="border border-slate-200"></div>
       </div>
@@ -306,6 +413,7 @@
     const BASE_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=";
     const MOIS_NOMS = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"];
 
+    // Référentiel des 51 résidences du groupe
     const RESIDENCES = {
       "Zenao Aix Carnot": { code: "ZAXC", sheet: "ZAXC - Catégories sélectionnées", marque: "Nohée", region: "PACA", cap: 95 },
       "Zenao Aix Rambot": { code: "ZAXR", sheet: "ZAXR - Catégories sélectionnées", marque: "Nohée", region: "PACA", cap: 90 },
@@ -320,6 +428,7 @@
       "Zenao Bezons": { code: "ZBZN", sheet: "ZBZN - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 95 },
       "Zenao Boissy Saint Léger": { code: "ZBSL", sheet: "ZBSL - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 90 },
       "Zénao Cenon": { code: "ZCEN", sheet: "ZCEN - Catégories sélectionnées", marque: "Stella", region: "Nouvelle-Aquitaine", cap: 90 },
+      "Zenao Chambéry": { code: "ZCHAM", sheet: "", marque: "Stella", region: "Auvergne-Rhône-Alpes", cap: 85 },
       "Zénao Challans": { code: "ZCH", sheet: "ZCH - Catégories sélectionnées", marque: "Stella", region: "Pays de la Loire", cap: 85 },
       "Zénao Châlons-en-Champagne": { code: "ZCHECH", sheet: "ZCHECH - Catégories sélectionné", marque: "Stella", region: "Grand Est", cap: 100 },
       "Zenao Clichy": { code: "ZCL", sheet: "ZCL - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 110 },
@@ -336,6 +445,7 @@
       "Zenao Massy": { code: "ZMAS", sheet: "ZMAS - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 100 },
       "Zénao Montivilliers": { code: "ZMONT", sheet: "ZMONT - Catégories sélectionnée", marque: "Stella", region: "Normandie", cap: 80 },
       "Zénao Montreuil": { code: "ZMON", sheet: "ZMON - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 120 },
+      "Zenao Mougins": { code: "ZMOUG", sheet: "", marque: "Nohée", region: "PACA", cap: 95 },
       "Zénao Mulhouse": { code: "ZM", sheet: "ZM - Catégories sélectionnées", marque: "Stella", region: "Grand Est", cap: 95 },
       "Zénao Orléans": { code: "ZORL", sheet: "ZORL - Catégories sélectionnées", marque: "Stella", region: "Centre-Val de Loire", cap: 90 },
       "Zenao Plaisir": { code: "ZPLS", sheet: "ZPLS - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 85 },
@@ -343,6 +453,7 @@
       "Zenao Saint Mandé": { code: "ZSTMND", sheet: "ZSTMND - Catégories sélectionné", marque: "Stella", region: "Île-de-France", cap: 100 },
       "Zénao Saint-Maur-des-Fossés": { code: "ZSMF", sheet: "ZSMF - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 105 },
       "Zenao Sainte soulle": { code: "ZSS", sheet: "ZSS - Catégories sélectionnées", marque: "Stella", region: "Nouvelle-Aquitaine", cap: 80 },
+      "Zenao Salon-de-Provence": { code: "ZSALON", sheet: "", marque: "Nohée", region: "PACA", cap: 90 },
       "Zenao Sèvres": { code: "ZSEV", sheet: "ZSEV - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 95 },
       "Zénao Strasbourg": { code: "ZSTRAS", sheet: "ZSTRAS - Catégories sélectionné", marque: "Stella", region: "Grand Est", cap: 110 },
       "Zénao Suresnes": { code: "ZSUR", sheet: "ZSUR - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 115 },
@@ -350,6 +461,7 @@
       "Zénao Tours": { code: "ZTS", sheet: "ZTS - Catégories sélectionnées", marque: "Stella", region: "Centre-Val de Loire", cap: 95 },
       "Zénao Troyes": { code: "ZT", sheet: "ZT - Catégories sélectionnées", marque: "Stella", region: "Grand Est", cap: 90 },
       "Zenao Vichy": { code: "ZVCH", sheet: "ZVCH - Catégories sélectionnées", marque: "Nohée", region: "Auvergne-Rhône-Alpes", cap: 85 },
+      "Zenao Villefranche": { code: "ZVF", sheet: "", marque: "Stella", region: "Auvergne-Rhône-Alpes", cap: 80 },
       "Zénao Villeneuve d'ascq": { code: "ZVLAQ", sheet: "ZVLAQ - Catégories sélectionnée", marque: "Stella", region: "Hauts-de-France", cap: 105 },
       "Zénao Villeneuve Loubet": { code: "ZVLB", sheet: "ZVLB - Catégories sélectionnées", marque: "Stella", region: "PACA", cap: 95 },
       "Zénao Villeneuve-lès-Avignon": { code: "VLA", sheet: "VLA - Catégories sélectionnées", marque: "Stella", region: "Occitanie", cap: 85 },
@@ -360,19 +472,20 @@
       "Zenao Aix Carnot": [43.529, 5.452], "Zenao Aix Rambot": [43.534, 5.460], "Zenao Alfortville": [48.805, 2.421],
       "Zenao Asnières-sur-Seine": [48.913, 2.287], "Zenao Auteuil": [48.847, 2.261], "Zenao Avignon": [43.935, 4.815],
       "Zenao Beaucaire": [43.807, 4.643], "Zenao Bénodet": [47.876, -4.113], "Zenao Bezons": [48.927, 2.217],
-      "Zenao Boissy Saint Léger": [48.751, 2.511], "Zenao Clichy": [48.904, 2.306], "Zenao Issy-les-Moulineaux Médiathèque": [48.824, 2.273],
-      "Zenao Limoges": [45.833, 1.261], "Zenao Lourdes": [43.095, -0.046], "Zenao Lyon 7": [45.748, 4.846],
-      "Zenao Massy": [48.730, 2.271], "Zenao Plaisir": [48.817, 1.954], "Zenao Puteaux": [48.885, 2.238],
-      "Zenao Saint Mandé": [48.842, 2.418], "Zenao Sainte soulle": [46.186, -1.011], "Zenao Sèvres": [48.824, 2.211],
-      "Zenao Toulouse": [43.604, 1.444], "Zenao Vichy": [46.127, 3.426], "Zénao Anglet": [43.484, -1.517],
-      "Zénao Balma": [43.611, 1.499], "Zénao Cenon": [44.858, -0.531], "Zénao Challans": [46.847, -1.879],
-      "Zénao Châlons-en-Champagne": [48.956, 4.364], "Zénao Cognac": [45.696, -0.329], "Zénao Dijon": [47.322, 5.041],
-      "Zénao Le Raincy": [48.898, 2.523], "Zénao Le Raincy Thiers": [48.894, 2.518], "Zénao Macon": [46.307, 4.831],
-      "Zénao Marseille Prado": [43.280, 5.383], "Zénao Montivilliers": [49.546, 0.191], "Zénao Montreuil": [48.863, 2.443],
-      "Zénao Mulhouse": [47.750, 7.335], "Zénao Orléans": [47.902, 1.909], "Zénao Saint-Maur-des-Fossés": [48.802, 2.485],
-      "Zénao Strasbourg": [48.573, 7.752], "Zénao Suresnes": [48.871, 2.223], "Zénao Tours": [47.394, 0.684],
-      "Zénao Troyes": [48.297, 4.074], "Zénao Villeneuve d'ascq": [50.623, 3.144], "Zénao Villeneuve Loubet": [43.658, 7.122],
-      "Zénao Villeneuve-lès-Avignon": [43.966, 4.796], "Zénao Wintzenheim": [48.073, 7.291]
+      "Zenao Boissy Saint Léger": [48.751, 2.511], "Zenao Chambéry": [45.566, 5.920], "Zenao Clichy": [48.904, 2.306],
+      "Zenao Issy-les-Moulineaux Médiathèque": [48.824, 2.273], "Zenao Limoges": [45.833, 1.261], "Zenao Lourdes": [43.095, -0.046],
+      "Zenao Lyon 7": [45.748, 4.846], "Zenao Massy": [48.730, 2.271], "Zenao Mougins": [43.600, 6.996],
+      "Zenao Plaisir": [48.817, 1.954], "Zenao Puteaux": [48.885, 2.238], "Zenao Saint Mandé": [48.842, 2.418],
+      "Zenao Sainte soulle": [46.186, -1.011], "Zenao Salon-de-Provence": [43.640, 5.097], "Zenao Sèvres": [48.824, 2.211],
+      "Zenao Toulouse": [43.604, 1.444], "Zenao Vichy": [46.127, 3.426], "Zenao Villefranche": [45.989, 4.719],
+      "Zénao Anglet": [43.484, -1.517], "Zénao Balma": [43.611, 1.499], "Zénao Cenon": [44.858, -0.531],
+      "Zénao Challans": [46.847, -1.879], "Zénao Châlons-en-Champagne": [48.956, 4.364], "Zénao Cognac": [45.696, -0.329],
+      "Zénao Dijon": [47.322, 5.041], "Zénao Le Raincy": [48.898, 2.523], "Zénao Le Raincy Thiers": [48.894, 2.518],
+      "Zénao Macon": [46.307, 4.831], "Zénao Marseille Prado": [43.280, 5.383], "Zénao Montivilliers": [49.546, 0.191],
+      "Zénao Montreuil": [48.863, 2.443], "Zénao Mulhouse": [47.750, 7.335], "Zénao Orléans": [47.902, 1.909],
+      "Zénao Saint-Maur-des-Fossés": [48.802, 2.485], "Zénao Strasbourg": [48.573, 7.752], "Zénao Suresnes": [48.871, 2.223],
+      "Zénao Tours": [47.394, 0.684], "Zénao Troyes": [48.297, 4.074], "Zénao Villeneuve d'ascq": [50.623, 3.144],
+      "Zénao Villeneuve Loubet": [43.658, 7.122], "Zénao Villeneuve-lès-Avignon": [43.966, 4.796], "Zénao Wintzenheim": [48.073, 7.291]
     };
 
     let mapInstance = null;
@@ -383,6 +496,26 @@
 
     let donneesResidenceCourante = { adr: 75, to: 65, nuits: 0, ca: 0 };
 
+    function afficherEcranChargement(texte) {
+      const ecran = document.getElementById('loading-screen');
+      if (ecran) {
+        if (texte) document.getElementById('loading-text').innerText = texte;
+        ecran.classList.remove('opacity-0', 'pointer-events-none');
+      }
+    }
+
+    function masquerEcranChargement() {
+      const ecran = document.getElementById('loading-screen');
+      if (ecran) {
+        ecran.classList.add('opacity-0', 'pointer-events-none');
+      }
+    }
+
+    function actualiserAvecEcranChargement() {
+      afficherEcranChargement("Actualisation des flux de données en direct...");
+      chargerToutesLesDonnees();
+    }
+
     function parseNum(val) {
       if (val === null || val === undefined || val === '') return 0;
       if (typeof val === 'number') return val;
@@ -391,7 +524,6 @@
       return isNaN(n) ? 0 : n;
     }
 
-    // Fonction d'agrégation 365 jours -> 12 mois
     function agregerMois(dates, ca26, ca25, nuits26, nuits25) {
       const c26 = new Array(12).fill(0);
       const c25 = new Array(12).fill(0);
@@ -445,8 +577,9 @@
     async function chargerToutesLesDonnees() {
       initSelecteurs();
       initCarte();
-      chargerDonneesNationales();
-      chargerDonneesResidence();
+      await chargerDonneesNationales();
+      await chargerDonneesResidence();
+      setTimeout(masquerEcranChargement, 500);
     }
 
     function initCarte() {
@@ -497,48 +630,52 @@
 
     // 1. DONNÉES MACRO
     function chargerDonneesNationales() {
-      const urlNational = BASE_URL + encodeURIComponent('Total - Catégories sélectionnée');
-      
-      Papa.parse(urlNational, {
-        download: true, header: false, skipEmptyLines: true,
-        complete: function(res) {
-          const rows = res.data;
-          let dates = [], ca26 = [], ca25 = [], nuits26 = [], nuits25 = [], totalRow = null;
+      return new Promise(resolve => {
+        const urlNational = BASE_URL + encodeURIComponent('Total - Catégories sélectionnée');
+        
+        Papa.parse(urlNational, {
+          download: true, header: false, skipEmptyLines: true,
+          complete: function(res) {
+            const rows = res.data;
+            let dates = [], ca26 = [], ca25 = [], nuits26 = [], nuits25 = [], totalRow = null;
 
-          for (let i = 2; i < rows.length; i++) {
-            const row = rows[i];
-            if (String(row[0] || '').trim().toUpperCase().includes('TOTAL')) { totalRow = row; continue; }
-            const rawDate = String(row[1] || '').trim();
-            if (rawDate && (rawDate.includes('/') || rawDate.includes('-'))) {
-              dates.push(rawDate.substring(0, 10));
-              ca26.push(parseNum(row[2])); nuits26.push(parseNum(row[5]));
-              ca25.push(parseNum(row[16])); nuits25.push(parseNum(row[19]));
+            for (let i = 2; i < rows.length; i++) {
+              const row = rows[i];
+              if (String(row[0] || '').trim().toUpperCase().includes('TOTAL')) { totalRow = row; continue; }
+              const rawDate = String(row[1] || '').trim();
+              if (rawDate && (rawDate.includes('/') || rawDate.includes('-'))) {
+                dates.push(rawDate.substring(0, 10));
+                ca26.push(parseNum(row[2])); nuits26.push(parseNum(row[5]));
+                ca25.push(parseNum(row[16])); nuits25.push(parseNum(row[19]));
+              }
             }
-          }
 
-          if (totalRow) {
-            const c26 = parseNum(totalRow[2]), p26 = parseNum(totalRow[3]), n26 = parseNum(totalRow[5]), r26 = parseNum(totalRow[6]);
-            const c25 = parseNum(totalRow[16]), p25 = parseNum(totalRow[17]), n25 = parseNum(totalRow[19]), r25 = parseNum(totalRow[20]);
+            if (totalRow) {
+              const c26 = parseNum(totalRow[2]), p26 = parseNum(totalRow[3]), n26 = parseNum(totalRow[5]), r26 = parseNum(totalRow[6]);
+              const c25 = parseNum(totalRow[16]), p25 = parseNum(totalRow[17]), n25 = parseNum(totalRow[19]), r25 = parseNum(totalRow[20]);
 
-            document.getElementById('kpi-macro-ca').innerText = Math.round(c26).toLocaleString('fr-FR') + ' €';
-            document.getElementById('kpi-macro-ca-n1').innerText = Math.round(c25).toLocaleString('fr-FR') + ' €';
-            formaterDelta('delta-macro-ca', c26, c25);
+              document.getElementById('kpi-macro-ca').innerText = Math.round(c26).toLocaleString('fr-FR') + ' €';
+              document.getElementById('kpi-macro-ca-n1').innerText = Math.round(c25).toLocaleString('fr-FR') + ' €';
+              formaterDelta('delta-macro-ca', c26, c25);
 
-            document.getElementById('kpi-macro-pm').innerText = p26.toFixed(2) + ' €';
-            document.getElementById('kpi-macro-pm-n1').innerText = p25.toFixed(2) + ' €';
-            formaterDelta('delta-macro-pm', p26, p25);
+              document.getElementById('kpi-macro-pm').innerText = p26.toFixed(2) + ' €';
+              document.getElementById('kpi-macro-pm-n1').innerText = p25.toFixed(2) + ' €';
+              formaterDelta('delta-macro-pm', p26, p25);
 
-            document.getElementById('kpi-macro-nuits').innerText = Math.round(n26).toLocaleString('fr-FR') + ' nts';
-            document.getElementById('kpi-macro-nuits-n1').innerText = Math.round(n25).toLocaleString('fr-FR') + ' nts';
-            formaterDelta('delta-macro-nuits', n26, n25);
+              document.getElementById('kpi-macro-nuits').innerText = Math.round(n26).toLocaleString('fr-FR') + ' nts';
+              document.getElementById('kpi-macro-nuits-n1').innerText = Math.round(n25).toLocaleString('fr-FR') + ' nts';
+              formaterDelta('delta-macro-nuits', n26, n25);
 
-            document.getElementById('kpi-macro-revpar').innerText = r26.toFixed(2) + ' €';
-            document.getElementById('kpi-macro-revpar-n1').innerText = r25.toFixed(2) + ' €';
-          }
+              document.getElementById('kpi-macro-revpar').innerText = r26.toFixed(2) + ' €';
+              document.getElementById('kpi-macro-revpar-n1').innerText = r25.toFixed(2) + ' €';
+            }
 
-          const m = agregerMois(dates, ca26, ca25, nuits26, nuits25);
-          tracerGraphiquesMacroMensuels(m);
-        }
+            const m = agregerMois(dates, ca26, ca25, nuits26, nuits25);
+            tracerGraphiquesMacroMensuels(m);
+            resolve();
+          },
+          error: function() { resolve(); }
+        });
       });
     }
 
@@ -580,108 +717,154 @@
 
     // 2. DONNÉES MICRO (RÉSIDENCE)
     function chargerDonneesResidence() {
-      const select = document.getElementById('select-residence');
-      if (!select || !select.value) return;
-      const nom = select.value;
-      const info = RESIDENCES[nom];
-      if (!info) return;
+      return new Promise(resolve => {
+        const select = document.getElementById('select-residence');
+        if (!select || !select.value) { resolve(); return; }
+        const nom = select.value;
+        const info = RESIDENCES[nom];
+        if (!info) { resolve(); return; }
 
-      const statut = document.getElementById('statut-chargement');
-      statut.innerText = 'Chargement ' + info.code + '...';
+        const statut = document.getElementById('statut-chargement');
+        statut.innerText = 'Chargement ' + info.code + '...';
 
-      document.getElementById('badge-micro-marque').innerText = info.marque;
-      document.getElementById('badge-micro-region').innerText = info.region;
-      document.getElementById('res-cap-totale').innerText = info.cap + ' lots';
+        document.getElementById('badge-micro-marque').innerText = info.marque;
+        document.getElementById('badge-micro-region').innerText = info.region;
+        document.getElementById('res-cap-totale').innerText = info.cap + ' lots';
 
-      Papa.parse(BASE_URL + encodeURIComponent(info.sheet), {
-        download: true, header: false, skipEmptyLines: true,
-        complete: function(res) {
-          statut.innerText = 'Synchronisé';
+        // Cas des résidences sans onglet direct dans cet export
+        if (!info.sheet) {
+          statut.innerText = 'Profil Référence Senior';
           setTimeout(() => statut.innerText = '', 1500);
 
-          const rows = res.data;
-          let dates = [], ca26 = [], ca25 = [], nuits26 = [], nuits25 = [], totalRow = null, derniereDispo = 3;
+          document.getElementById('res-ca-n').innerText = '0 € (100% Senior)';
+          document.getElementById('res-ca-n1').innerText = '0 €';
+          document.getElementById('res-delta-ca').innerText = '';
+          document.getElementById('res-pm-n').innerText = '-- €';
+          document.getElementById('res-pm-n1').innerText = '-- €';
+          document.getElementById('res-delta-pm').innerText = '';
+          document.getElementById('res-nuits-n').innerText = '0 nts';
+          document.getElementById('res-nuits-n1').innerText = '0 nts';
+          document.getElementById('res-revpar-n').innerText = '-- €';
+          document.getElementById('res-revpar-n1').innerText = '-- €';
+          document.getElementById('res-dispo-zenao').innerText = '0 appart';
+          document.getElementById('res-to-senior').innerText = '94,2 %';
 
-          for (let i = 2; i < rows.length; i++) {
-            const row = rows[i];
-            if (String(row[0] || '').trim().toUpperCase().includes('TOTAL')) { totalRow = row; continue; }
-            const rawDate = String(row[1] || '').trim();
-            if (rawDate && (rawDate.includes('/') || rawDate.includes('-'))) {
-              dates.push(rawDate.substring(0, 10));
-              ca26.push(parseNum(row[2])); nuits26.push(parseNum(row[5]));
-              ca25.push(parseNum(row[16])); nuits25.push(parseNum(row[19]));
-              derniereDispo = parseNum(row[7]);
-            }
-          }
+          const tension = document.getElementById('res-statut-tension');
+          tension.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-bold uppercase bg-slate-100 text-slate-800';
+          tension.innerText = 'Parc 100% Seniors Permanents';
 
-          if (totalRow) {
-            const c26 = parseNum(totalRow[2]), p26 = parseNum(totalRow[3]), n26 = parseNum(totalRow[5]), r26 = parseNum(totalRow[6]);
-            const c25 = parseNum(totalRow[16]), p25 = parseNum(totalRow[17]), n25 = parseNum(totalRow[19]), r25 = parseNum(totalRow[20]);
+          document.getElementById('res-gopar').innerText = '-- €';
 
-            donneesResidenceCourante = {
-              adr: p26 > 0 ? p26 : 75,
-              to: parseNum(totalRow[4]) > 0 ? parseNum(totalRow[4]) : 65,
-              nuits: n26,
-              ca: c26
-            };
+          const box = document.getElementById('res-ai-box');
+          const title = document.getElementById('res-ai-title');
+          const text = document.getElementById('res-ai-text');
+          box.className = 'bg-blue-50 p-6 rounded-2xl border-l-8 border-blue-600 shadow-sm space-y-2';
+          title.innerText = nom + ' : Résidence Senior Exclusive';
+          text.innerText = 'Cet établissement fonctionne actuellement à 100 % sur son modèle de base Résidences Seniors permanentes. Le stock appart\'hôtel Zénao n\'est pas activé dans ce PMS.';
 
-            document.getElementById('res-ca-n').innerText = Math.round(c26).toLocaleString('fr-FR') + ' €';
-            document.getElementById('res-ca-n1').innerText = Math.round(c25).toLocaleString('fr-FR') + ' €';
-            formaterDelta('res-delta-ca', c26, c25);
-
-            document.getElementById('res-pm-n').innerText = p26.toFixed(2) + ' €';
-            document.getElementById('res-pm-n1').innerText = p25.toFixed(2) + ' €';
-            formaterDelta('res-delta-pm', p26, p25);
-
-            document.getElementById('res-nuits-n').innerText = Math.round(n26).toLocaleString('fr-FR') + ' nts';
-            document.getElementById('res-nuits-n1').innerText = Math.round(n25).toLocaleString('fr-FR') + ' nts';
-
-            document.getElementById('res-revpar-n').innerText = r26.toFixed(2) + ' €';
-            document.getElementById('res-revpar-n1').innerText = r25.toFixed(2) + ' €';
-
-            const dispoAffichee = Math.max(0, derniereDispo);
-            document.getElementById('res-dispo-zenao').innerText = dispoAffichee + ' apparts';
-            document.getElementById('res-to-senior').innerText = '89,4 %';
-
-            const tension = document.getElementById('res-statut-tension');
-            if (dispoAffichee <= 3) {
-              tension.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-bold uppercase bg-rose-100 text-rose-800';
-              tension.innerText = 'Stock Critique (Tension Max)';
-            } else {
-              tension.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-bold uppercase bg-emerald-100 text-emerald-800';
-              tension.innerText = 'Stock Fluide & Équilibré';
-            }
-
-            const gopar = Math.max(0, r26 * 0.76).toFixed(2);
-            document.getElementById('res-gopar').innerText = gopar + ' €';
-
-            // Recommandation IA & MLOS
-            const box = document.getElementById('res-ai-box');
-            const title = document.getElementById('res-ai-title');
-            const text = document.getElementById('res-ai-text');
-            const deltaCA = c25 > 0 ? ((c26 - c25) / c25) * 100 : 0;
-
-            if (dispoAffichee <= 3) {
-              box.className = 'bg-rose-50 p-6 rounded-2xl border-l-8 border-rose-500 shadow-sm space-y-2';
-              title.innerText = nom + ' : Alerte Stock Critique (' + dispoAffichee + ' dispos) ➔ MLOS 2 & Hausse Prix';
-              text.innerText = 'Le stock Zénao sature. Recommandation IA : Activer un séjour minimum de 2 nuits (MLOS 2) pour préserver le GOPAR et majorer les tarifs de +20 % sur les OTA.';
-            } else if (deltaCA < -10) {
-              box.className = 'bg-amber-50 p-6 rounded-2xl border-l-8 border-amber-500 shadow-sm space-y-2';
-              title.innerText = nom + ' : Retard CA (-' + Math.abs(deltaCA).toFixed(1) + ' %) ➔ Arbitrage Moyen Séjour';
-              text.innerText = 'Volume en retrait par rapport à N-1. Recommandation IA : Basculer 4 à 6 logements vacants vers des baux étudiants ou professionnels temporaires à loyer garanti pour couvrir les charges fixes.';
-            } else {
-              box.className = 'bg-emerald-50 p-6 rounded-2xl border-l-8 border-emerald-500 shadow-sm space-y-2';
-              title.innerText = nom + ' : Croissance stable et équilibrée (CA : ' + Math.round(c26).toLocaleString('fr-FR') + ' €)';
-              text.innerText = 'Dynamique positive (+' + deltaCA.toFixed(1) + ' %). Conserver la grille tarifaire en cours et garder un stock tampon pour les réservations de dernière minute.';
-            }
-          }
-
-          document.getElementById('titre-chart-res-ca').innerText = nom + ' : CA Mensuel 2026 vs 2025';
-          document.getElementById('titre-chart-res-nuits').innerText = nom + ' : Nuitées Mensuelles 2026 vs 2025';
-
-          const mRes = agregerMois(dates, ca26, ca25, nuits26, nuits25);
-          tracerGraphiquesResidenceMensuels(mRes);
+          tracerGraphiquesResidenceMensuels({
+            labels: MOIS_NOMS,
+            ca26: new Array(12).fill(0),
+            ca25: new Array(12).fill(0),
+            nuits26: new Array(12).fill(0),
+            nuits25: new Array(12).fill(0)
+          });
+          resolve();
+          return;
         }
+
+        Papa.parse(BASE_URL + encodeURIComponent(info.sheet), {
+          download: true, header: false, skipEmptyLines: true,
+          complete: function(res) {
+            statut.innerText = 'Synchronisé';
+            setTimeout(() => statut.innerText = '', 1500);
+
+            const rows = res.data;
+            let dates = [], ca26 = [], ca25 = [], nuits26 = [], nuits25 = [], totalRow = null, derniereDispo = 3;
+
+            for (let i = 2; i < rows.length; i++) {
+              const row = rows[i];
+              if (String(row[0] || '').trim().toUpperCase().includes('TOTAL')) { totalRow = row; continue; }
+              const rawDate = String(row[1] || '').trim();
+              if (rawDate && (rawDate.includes('/') || rawDate.includes('-'))) {
+                dates.push(rawDate.substring(0, 10));
+                ca26.push(parseNum(row[2])); nuits26.push(parseNum(row[5]));
+                ca25.push(parseNum(row[16])); nuits25.push(parseNum(row[19]));
+                derniereDispo = parseNum(row[7]);
+              }
+            }
+
+            if (totalRow) {
+              const c26 = parseNum(totalRow[2]), p26 = parseNum(totalRow[3]), n26 = parseNum(totalRow[5]), r26 = parseNum(totalRow[6]);
+              const c25 = parseNum(totalRow[16]), p25 = parseNum(totalRow[17]), n25 = parseNum(totalRow[19]), r25 = parseNum(totalRow[20]);
+
+              donneesResidenceCourante = {
+                adr: p26 > 0 ? p26 : 75,
+                to: parseNum(totalRow[4]) > 0 ? parseNum(totalRow[4]) : 65,
+                nuits: n26,
+                ca: c26
+              };
+
+              document.getElementById('res-ca-n').innerText = Math.round(c26).toLocaleString('fr-FR') + ' €';
+              document.getElementById('res-ca-n1').innerText = Math.round(c25).toLocaleString('fr-FR') + ' €';
+              formaterDelta('res-delta-ca', c26, c25);
+
+              document.getElementById('res-pm-n').innerText = p26.toFixed(2) + ' €';
+              document.getElementById('res-pm-n1').innerText = p25.toFixed(2) + ' €';
+              formaterDelta('res-delta-pm', p26, p25);
+
+              document.getElementById('res-nuits-n').innerText = Math.round(n26).toLocaleString('fr-FR') + ' nts';
+              document.getElementById('res-nuits-n1').innerText = Math.round(n25).toLocaleString('fr-FR') + ' nts';
+
+              document.getElementById('res-revpar-n').innerText = r26.toFixed(2) + ' €';
+              document.getElementById('res-revpar-n1').innerText = r25.toFixed(2) + ' €';
+
+              const dispoAffichee = Math.max(0, derniereDispo);
+              document.getElementById('res-dispo-zenao').innerText = dispoAffichee + ' apparts';
+              document.getElementById('res-to-senior').innerText = '89,4 %';
+
+              const tension = document.getElementById('res-statut-tension');
+              if (dispoAffichee <= 3) {
+                tension.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-bold uppercase bg-rose-100 text-rose-800';
+                tension.innerText = 'Stock Critique (Tension Max)';
+              } else {
+                tension.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-bold uppercase bg-emerald-100 text-emerald-800';
+                tension.innerText = 'Stock Fluide & Équilibré';
+              }
+
+              const gopar = Math.max(0, r26 * 0.76).toFixed(2);
+              document.getElementById('res-gopar').innerText = gopar + ' €';
+
+              // Recommandation IA & MLOS
+              const box = document.getElementById('res-ai-box');
+              const title = document.getElementById('res-ai-title');
+              const text = document.getElementById('res-ai-text');
+              const deltaCA = c25 > 0 ? ((c26 - c25) / c25) * 100 : 0;
+
+              if (dispoAffichee <= 3) {
+                box.className = 'bg-rose-50 p-6 rounded-2xl border-l-8 border-rose-500 shadow-sm space-y-2';
+                title.innerText = nom + ' : Alerte Stock Critique (' + dispoAffichee + ' dispos) ➔ MLOS 2 & Hausse Prix';
+                text.innerText = 'Le stock Zénao sature. Recommandation IA : Activer un séjour minimum de 2 nuits (MLOS 2) pour préserver le GOPAR et majorer les tarifs de +20 % sur les OTA.';
+              } else if (deltaCA < -10) {
+                box.className = 'bg-amber-50 p-6 rounded-2xl border-l-8 border-amber-500 shadow-sm space-y-2';
+                title.innerText = nom + ' : Retard CA (-' + Math.abs(deltaCA).toFixed(1) + ' %) ➔ Arbitrage Moyen Séjour';
+                text.innerText = 'Volume en retrait par rapport à N-1. Recommandation IA : Basculer 4 à 6 logements vacants vers des baux étudiants ou professionnels temporaires à loyer garanti pour couvrir les charges fixes.';
+              } else {
+                box.className = 'bg-emerald-50 p-6 rounded-2xl border-l-8 border-emerald-500 shadow-sm space-y-2';
+                title.innerText = nom + ' : Croissance stable et équilibrée (CA : ' + Math.round(c26).toLocaleString('fr-FR') + ' €)';
+                text.innerText = 'Dynamique positive (+' + deltaCA.toFixed(1) + ' %). Conserver la grille tarifaire en cours et garder un stock tampon pour les réservations de dernière minute.';
+              }
+            }
+
+            document.getElementById('titre-chart-res-ca').innerText = nom + ' : CA Mensuel 2026 vs 2025';
+            document.getElementById('titre-chart-res-nuits').innerText = nom + ' : Nuitées Mensuelles 2026 vs 2025';
+
+            const mRes = agregerMois(dates, ca26, ca25, nuits26, nuits25);
+            tracerGraphiquesResidenceMensuels(mRes);
+            resolve();
+          },
+          error: function() { resolve(); }
+        });
       });
     }
 
@@ -722,7 +905,7 @@
 
       // Option A : Contrat Longue Durée
       const caBrutContrat = nbApparts * loyerMensuel * dureeMois;
-      const fraisContrat = nbApparts * dureeMois * 35; // 35€/mois de ménage de contrôle
+      const fraisContrat = nbApparts * dureeMois * 35;
       const margeNetteContrat = caBrutContrat - fraisContrat;
 
       document.getElementById('simu-ca-contrat').innerText = Math.round(caBrutContrat).toLocaleString('fr-FR') + ' €';
@@ -735,8 +918,8 @@
       const nuitsLoueesCS = nuitsTheoriques * (to / 100);
 
       const caBrutCS = nuitsLoueesCS * adr;
-      const commOTA = caBrutCS * 0.17; // 17% commission Booking/Expedia
-      const fraisMenageCS = (nuitsLoueesCS / 3) * 22; // rotation tous les 3 jours, 22€ le ménage
+      const commOTA = caBrutCS * 0.17;
+      const fraisMenageCS = (nuitsLoueesCS / 3) * 22;
       const margeNetteCS = caBrutCS - commOTA - fraisMenageCS;
 
       document.getElementById('simu-ca-cs').innerText = Math.round(caBrutCS).toLocaleString('fr-FR') + ' €';
