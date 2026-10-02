@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RMS Zénao - Données Live Google Sheets</title>
+  <title>RMS Zénao - Master Thesis Revenue Management System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,33 +11,34 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     .tab-active { border-bottom: 3px solid #2563eb; color: #1d4ed8; font-weight: 700; }
-    #map-france { height: 380px; width: 100%; border-radius: 1rem; z-index: 10; }
+    #map-france { height: 400px; width: 100%; border-radius: 1rem; z-index: 10; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
 
-  <!-- Header -->
+  <!-- En-tête Principal -->
   <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16 items-center">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm">Z</div>
           <div>
-            <span class="text-lg font-black text-slate-900 tracking-tight block">RMS Zénao Appart'Hôtel</span>
-            <span class="text-xs text-slate-500 font-medium">Connecté en direct à votre Google Sheet multi-onglets (Stella & Nohée)</span>
+            <span class="text-lg font-black text-slate-900 tracking-tight block">RMS Zénao & Nohée • Master Thesis</span>
+            <span class="text-xs text-slate-500 font-medium">Système de Décision Hybride (Seniors & Appart'Hôtel)</span>
           </div>
         </div>
-        <button onclick="chargerDonneesNationales()" class="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold px-3 py-2 rounded-xl transition">
-          🔄 Actualiser en direct
+        <button onclick="chargerToutesLesDonnees()" class="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold px-3 py-2 rounded-xl transition">
+          🔄 Actualiser les données Live
         </button>
       </div>
 
+      <!-- Navigation 2 Onglets (Macro / Micro) -->
       <div class="flex gap-6 text-sm overflow-x-auto">
         <button id="tab-btn-macro" onclick="changerOnglet('macro')" class="py-3 px-1 tab-active transition whitespace-nowrap">
-          1. Vue Réseau & Cartographie (Macro RM)
+          1. Macro RM : Réseau, Cartographie & Filtres
         </button>
         <button id="tab-btn-micro" onclick="changerOnglet('micro')" class="py-3 px-1 text-slate-500 hover:text-slate-700 transition whitespace-nowrap">
-          2. Détail par Résidence Spécifique (Micro RM)
+          2. Micro RM : Arbitrage Résidence & IA Stratégique
         </button>
       </div>
     </div>
@@ -45,19 +46,21 @@
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <!-- ================= ONGLET 1 : MACRO RM ================= -->
+    <!-- ================================================================= -->
+    <!-- ONGLET 1 : MACRO RM (Réseau, Filtres, Carte & Courbes Globales)    -->
+    <!-- ================================================================= -->
     <div id="section-macro" class="space-y-6">
       
-      <!-- Filtres -->
+      <!-- Barre de Filtres Réseau -->
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
         <div class="flex flex-wrap gap-3 items-center">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Filtrer par :</span>
-          <select id="filtre-marque" onchange="filtrerCarte()" class="bg-slate-50 border border-slate-200 text-sm font-bold rounded-xl px-3 py-2 text-slate-700">
-            <option value="TOUS">Tout le réseau (47 résidences)</option>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Filtrer le réseau :</span>
+          <select id="filtre-marque" onchange="filtrerRéseau()" class="bg-slate-50 border border-slate-200 text-sm font-bold rounded-xl px-3 py-2 text-slate-700 focus:outline-blue-500">
+            <option value="TOUS">Toutes les marques (Stella & Nohée)</option>
             <option value="Stella">Stella Management</option>
             <option value="Nohée">Résidences Nohée</option>
           </select>
-          <select id="filtre-region" onchange="filtrerCarte()" class="bg-slate-50 border border-slate-200 text-sm font-bold rounded-xl px-3 py-2 text-slate-700">
+          <select id="filtre-region" onchange="filtrerRéseau()" class="bg-slate-50 border border-slate-200 text-sm font-bold rounded-xl px-3 py-2 text-slate-700 focus:outline-blue-500">
             <option value="TOUS">Toutes les régions</option>
             <option value="Île-de-France">Île-de-France</option>
             <option value="PACA">PACA</option>
@@ -65,13 +68,12 @@
             <option value="Occitanie">Occitanie</option>
             <option value="Grand Est">Grand Est</option>
             <option value="Auvergne-Rhône-Alpes">Auvergne-Rhône-Alpes</option>
-            <option value="Autres">Autres Régions</option>
           </select>
         </div>
         <div class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg" id="compteur-residences">47 résidences actives</div>
       </div>
 
-      <!-- KPI Macro Consolidés Nationaux (Onglet Total) -->
+      <!-- KPI Macro Réseau (N vs N-1) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
           <span class="text-xs font-semibold text-slate-400 uppercase">CA Zénao Réseau 2026</span>
@@ -95,19 +97,19 @@
         </div>
       </div>
 
-      <!-- Carte Interactive -->
+      <!-- Carte Interactive Leaflet -->
       <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
         <div class="flex justify-between items-center">
-          <h3 class="font-bold text-slate-900 text-sm">Cartographie du Réseau (Cliquez sur une résidence pour ouvrir son onglet)</h3>
-          <span class="text-xs text-slate-400">Pastille verte = Fluide • Rouge = Sous tension</span>
+          <h3 class="font-bold text-slate-900 text-sm">Cartographie Stratégique du Réseau</h3>
+          <span class="text-xs text-slate-400">🟢 Stock fluide • 🟠 Stock modéré • 🔴 Stock critique (≤3 apparts)</span>
         </div>
         <div id="map-france" class="border border-slate-200"></div>
       </div>
 
-      <!-- Courbe Nationale 365 Jours N vs N-1 -->
+      <!-- Graphiques Réseau 365 Jours -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <h3 class="font-bold text-slate-900 text-sm">Courbe Annuelle Réseau : Chiffre d'Affaires Journalier (2026 vs 2025)</h3>
+          <h3 class="font-bold text-slate-900 text-sm">Chiffre d'Affaires Journalier Réseau (2026 vs 2025)</h3>
           <div class="relative h-64"><canvas id="chart-macro-ca"></canvas></div>
         </div>
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
@@ -117,14 +119,17 @@
       </div>
     </div>
 
-    <!-- ================= ONGLET 2 : MICRO RM ================= -->
+
+    <!-- ================================================================= -->
+    <!-- ONGLET 2 : MICRO RM (Arbitrage par Résidence & IA Stratégique)     -->
+    <!-- ================================================================= -->
     <div id="section-micro" class="space-y-6 hidden">
       
       <!-- Sélecteur de Résidence -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
-          <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Sélectionner une résidence :</label>
-          <select id="select-residence" onchange="chargerDonneesResidence()" class="bg-slate-50 border border-slate-200 text-base font-bold rounded-xl px-4 py-2 text-slate-800 w-full sm:w-96 focus:outline-blue-500"></select>
+          <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Sélectionner un établissement :</label>
+          <select id="select-residence" onchange="changerResidence()" class="bg-slate-50 border border-slate-200 text-base font-bold rounded-xl px-4 py-2 text-slate-800 w-full sm:w-96 focus:outline-blue-500"></select>
         </div>
         <div class="flex items-center gap-2">
           <span id="badge-micro-marque" class="bg-blue-50 text-blue-700 font-bold text-xs px-3 py-1.5 rounded-lg border border-blue-200">Marque</span>
@@ -133,11 +138,11 @@
         </div>
       </div>
 
-      <!-- Métriques Résidence Spécifique -->
+      <!-- Métriques Hybrides (Seniors vs Zénao & GOPAR) -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">1. TO Senior Estimé</span>
-          <div id="res-to-senior" class="text-3xl font-black text-slate-900 mt-2">-- %</div>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">1. TO Senior (Cœur de métier)</span>
+          <div id="res-to-senior" class="text-3xl font-black text-slate-900 mt-2">89.4%</div>
           <p class="text-xs text-slate-500 mt-1">Capacité totale du site : <strong id="res-cap-totale">-- lots</strong></p>
         </div>
 
@@ -150,14 +155,14 @@
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <span class="text-xs font-bold uppercase tracking-wider text-slate-400">3. GOPAR Net / Nuit</span>
           <div id="res-gopar" class="text-3xl font-black text-emerald-600 mt-2">-- €</div>
-          <p class="text-xs text-slate-500 mt-1">Marge nette commissions déduites</p>
+          <p class="text-xs text-slate-500 mt-1">Commissions & frais de ménage déduits</p>
         </div>
       </div>
 
       <!-- Performances N vs N-1 Résidence Spécifique -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <span class="text-xs font-semibold text-slate-400 uppercase">CA Annuel Réel</span>
+          <span class="text-xs font-semibold text-slate-400 uppercase">CA Zénao Réalisé</span>
           <div id="res-ca-n" class="text-2xl font-black text-slate-900 mt-1">-- €</div>
           <div class="text-xs text-slate-400 mt-1">2025 : <strong id="res-ca-n1">-- €</strong> <span id="res-delta-ca" class="font-bold ml-1"></span></div>
         </div>
@@ -172,27 +177,27 @@
           <div class="text-xs text-slate-400 mt-1">2025 : <strong id="res-nuits-n1">-- nts</strong></div>
         </div>
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <span class="text-xs font-semibold text-slate-400 uppercase">RevPAR Annuel</span>
+          <span class="text-xs font-semibold text-slate-400 uppercase">RevPAR Résidence</span>
           <div id="res-revpar-n" class="text-2xl font-black text-indigo-600 mt-1">-- €</div>
           <div class="text-xs text-slate-400 mt-1">2025 : <strong id="res-revpar-n1">-- €</strong></div>
         </div>
       </div>
 
-      <!-- Graphiques Spécifiques de la Résidence Sélectionnée (365 jours) -->
+      <!-- Graphiques 365 Jours de la Résidence Sélectionnée -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <h3 class="font-bold text-slate-900 text-sm" id="titre-chart-res-ca">Évolution Journalière du CA (2026 vs 2025)</h3>
+          <h3 class="font-bold text-slate-900 text-sm" id="titre-chart-res-ca">Évolution du CA (2026 vs 2025)</h3>
           <div class="relative h-64"><canvas id="chart-res-ca"></canvas></div>
         </div>
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <h3 class="font-bold text-slate-900 text-sm" id="titre-chart-res-nuits">Nuitées Vendues par Jour (2026 vs 2025)</h3>
+          <h3 class="font-bold text-slate-900 text-sm" id="titre-chart-res-nuits">Nuitées par Jour (2026 vs 2025)</h3>
           <div class="relative h-64"><canvas id="chart-res-nuits"></canvas></div>
         </div>
       </div>
 
-      <!-- Diagnostic IA Spécifique Résidence -->
+      <!-- Recommandation IA & MLOS -->
       <div id="res-ai-box" class="bg-white p-6 rounded-2xl border-l-8 border-blue-600 shadow-sm space-y-2">
-        <h4 id="res-ai-title" class="font-bold text-slate-900 text-base">Consigne Opérationnelle de Yield</h4>
+        <h4 id="res-ai-title" class="font-bold text-slate-900 text-base">Consigne Opérationnelle de Yield & MLOS</h4>
         <p id="res-ai-text" class="text-sm text-slate-600 leading-relaxed">Chargement...</p>
       </div>
     </div>
@@ -200,11 +205,9 @@
   </main>
 
   <script>
-    // 🔗 VOTRE CLASSEUR GOOGLE SHEETS MULTI-ONGLETS OFFICIEL :
     const SHEET_ID = "1uOLfWZjWGecJVIndPIiIwDggArNRM--Ed5VRbut6mpE";
     const BASE_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=`;
 
-    // Référentiel des 47 résidences avec le nom exact de leur onglet dans votre Google Sheet
     const RESIDENCES = {
       "Zenao Aix Carnot": { code: "ZAXC", sheet: "ZAXC - Catégories sélectionnées", marque: "Nohée", region: "PACA", cap: 95 },
       "Zenao Aix Rambot": { code: "ZAXR", sheet: "ZAXR - Catégories sélectionnées", marque: "Nohée", region: "PACA", cap: 90 },
@@ -280,7 +283,6 @@
     let chartResCA = null;
     let chartResNuits = null;
 
-    // Helper pour parser les nombres français ou standards
     function parseNum(val) {
       if (val === null || val === undefined || val === '') return 0;
       if (typeof val === 'number') return val;
@@ -298,69 +300,55 @@
       if (onglet === 'micro' && !chartResCA) chargerDonneesResidence();
     }
 
-    // 1. CHARGEMENT DE L'ONGLET NATIONAL (Total - Catégories sélectionnée)
+    async function chargerToutesLesDonnees() {
+      initSelecteur();
+      initCarte();
+      await chargerDonneesNationales();
+      await chargerDonneesResidence();
+    }
+
+    // 1. CHARGEMENT MACRO (Réseau global)
     async function chargerDonneesNationales() {
       const urlNational = BASE_URL + encodeURIComponent('Total - Catégories sélectionnée');
       
       Papa.parse(urlNational, {
-        download: true,
-        header: false,
-        skipEmptyLines: true,
+        download: true, header: false, skipEmptyLines: true,
         complete: function(res) {
           const rows = res.data;
-          let dailyDates = [];
-          let dailyCA26 = [];
-          let dailyCA25 = [];
-          let dailyNuits26 = [];
-          let dailyNuits25 = [];
-          let totalRow = null;
+          let dates = [], ca26 = [], ca25 = [], nuits26 = [], nuits25 = [], totalRow = null;
 
           for (let i = 2; i < rows.length; i++) {
             const row = rows[i];
-            const col0 = String(row[0] || '').trim().toUpperCase();
-            if (col0.includes('TOTAL')) {
-              totalRow = row;
-              continue;
-            }
-
+            if (String(row[0] || '').trim().toUpperCase().includes('TOTAL')) { totalRow = row; continue; }
             const rawDate = String(row[1] || '').trim();
             if (rawDate && (rawDate.includes('/') || rawDate.includes('-'))) {
-              dailyDates.push(rawDate.substring(0, 10));
-              dailyCA26.push(parseNum(row[2]));
-              dailyNuits26.push(parseNum(row[5]));
-              dailyCA25.push(parseNum(row[16]));
-              dailyNuits25.push(parseNum(row[19]));
+              dates.push(rawDate.substring(0, 10));
+              ca26.push(parseNum(row[2])); nuits26.push(parseNum(row[5]));
+              ca25.push(parseNum(row[16])); nuits25.push(parseNum(row[19]));
             }
           }
 
           if (totalRow) {
-            const ca26 = parseNum(totalRow[2]);
-            const pm26 = parseNum(totalRow[3]);
-            const nuits26 = parseNum(totalRow[5]);
-            const revpar26 = parseNum(totalRow[6]);
+            const c26 = parseNum(totalRow[2]), p26 = parseNum(totalRow[3]), n26 = parseNum(totalRow[5]), r26 = parseNum(totalRow[6]);
+            const c25 = parseNum(totalRow[16]), p25 = parseNum(totalRow[17]), n25 = parseNum(totalRow[19]), r25 = parseNum(totalRow[20]);
 
-            const ca25 = parseNum(totalRow[16]);
-            const pm25 = parseNum(totalRow[17]);
-            const nuits25 = parseNum(totalRow[19]);
-            const revpar25 = parseNum(totalRow[20]);
+            document.getElementById('kpi-macro-ca').innerText = Math.round(c26).toLocaleString('fr-FR') + ' €';
+            document.getElementById('kpi-macro-ca-n1').innerText = Math.round(c25).toLocaleString('fr-FR') + ' €';
+            formaterDelta('delta-macro-ca', c26, c25);
 
-            document.getElementById('kpi-macro-ca').innerText = Math.round(ca26).toLocaleString('fr-FR') + ' €';
-            document.getElementById('kpi-macro-ca-n1').innerText = Math.round(ca25).toLocaleString('fr-FR') + ' €';
-            formaterDelta('delta-macro-ca', ca26, ca25);
+            document.getElementById('kpi-macro-pm').innerText = p26.toFixed(2) + ' €';
+            document.getElementById('kpi-macro-pm-n1').innerText = p25.toFixed(2) + ' €';
+            formaterDelta('delta-macro-pm', p26, p25);
 
-            document.getElementById('kpi-macro-pm').innerText = pm26.toFixed(2) + ' €';
-            document.getElementById('kpi-macro-pm-n1').innerText = pm25.toFixed(2) + ' €';
-            formaterDelta('delta-macro-pm', pm26, pm25);
+            document.getElementById('kpi-macro-nuits').innerText = Math.round(n26).toLocaleString('fr-FR') + ' nts';
+            document.getElementById('kpi-macro-nuits-n1').innerText = Math.round(n25).toLocaleString('fr-FR') + ' nts';
+            formaterDelta('delta-macro-nuits', n26, n25);
 
-            document.getElementById('kpi-macro-nuits').innerText = Math.round(nuits26).toLocaleString('fr-FR') + ' nts';
-            document.getElementById('kpi-macro-nuits-n1').innerText = Math.round(nuits25).toLocaleString('fr-FR') + ' nts';
-            formaterDelta('delta-macro-nuits', nuits26, nuits25);
-
-            document.getElementById('kpi-macro-revpar').innerText = revpar26.toFixed(2) + ' €';
-            document.getElementById('kpi-macro-revpar-n1').innerText = revpar25.toFixed(2) + ' €';
+            document.getElementById('kpi-macro-revpar').innerText = r26.toFixed(2) + ' €';
+            document.getElementById('kpi-macro-revpar-n1').innerText = r25.toFixed(2) + ' €';
           }
 
-          tracerGraphiquesMacro(dailyDates, dailyCA26, dailyCA25, dailyNuits26, dailyNuits25);
+          tracerGraphiquesMacro(dates, ca26, ca25, nuits26, nuits25);
         }
       });
     }
@@ -381,7 +369,7 @@
           labels: dates,
           datasets: [
             { label: 'CA Réseau 2026 (€)', data: ca26, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.06)', fill: true, tension: 0.1 },
-            { label: 'CA Réseau 2025 N-1 (€)', data: ca25, borderColor: '#94a3b8', borderDash: [4, 4], fill: false, tension: 0.1 }
+            { label: 'CA Réseau 2025 (€)', data: ca25, borderColor: '#94a3b8', borderDash: [4, 4], fill: false, tension: 0.1 }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false }
@@ -393,94 +381,66 @@
         data: {
           labels: dates,
           datasets: [
-            { label: 'Nuitées Réseau 2026', data: nuits26, backgroundColor: '#4f46e5', borderRadius: 2 },
-            { label: 'Nuitées Réseau 2025', data: nuits25, backgroundColor: '#cbd5e1', borderRadius: 2 }
+            { label: 'Nuitées 2026', data: nuits26, backgroundColor: '#4f46e5', borderRadius: 2 },
+            { label: 'Nuitées 2025', data: nuits25, backgroundColor: '#cbd5e1', borderRadius: 2 }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false }
       });
     }
 
-    // 2. CHARGEMENT D'UN ONGLET DE RÉSIDENCE SPÉCIFIQUE EN DIRECT
+    // 2. CHARGEMENT MICRO (Résidence spécifique & IA)
     async function chargerDonneesResidence() {
       const nom = document.getElementById('select-residence').value;
-      const resInfo = RESIDENCES[nom];
-      if (!resInfo) return;
+      const info = RESIDENCES[nom];
+      if (!info) return;
 
       const statut = document.getElementById('statut-chargement');
-      statut.innerText = `Chargement direct de l'onglet ${resInfo.code}...`;
+      statut.innerText = `Chargement ${info.code}...`;
 
-      document.getElementById('badge-micro-marque').innerText = resInfo.marque;
-      document.getElementById('badge-micro-region').innerText = resInfo.region;
-      document.getElementById('res-cap-totale').innerText = `${resInfo.cap} lots`;
+      document.getElementById('badge-micro-marque').innerText = info.marque;
+      document.getElementById('badge-micro-region').innerText = info.region;
+      document.getElementById('res-cap-totale').innerText = `${info.cap} lots`;
 
-      const urlResidence = BASE_URL + encodeURIComponent(resInfo.sheet);
-
-      Papa.parse(urlResidence, {
-        download: true,
-        header: false,
-        skipEmptyLines: true,
+      Papa.parse(BASE_URL + encodeURIComponent(info.sheet), {
+        download: true, header: false, skipEmptyLines: true,
         complete: function(res) {
-          statut.innerText = 'Synchronisé en direct';
-          setTimeout(() => statut.innerText = '', 2000);
+          statut.innerText = 'Synchronisé';
+          setTimeout(() => statut.innerText = '', 1500);
 
           const rows = res.data;
-          let dailyDates = [];
-          let dailyCA26 = [];
-          let dailyCA25 = [];
-          let dailyNuits26 = [];
-          let dailyNuits25 = [];
-          let totalRow = null;
-          let derniereDispo = 3;
+          let dates = [], ca26 = [], ca25 = [], nuits26 = [], nuits25 = [], totalRow = null, derniereDispo = 3;
 
           for (let i = 2; i < rows.length; i++) {
             const row = rows[i];
-            const col0 = String(row[0] || '').trim().toUpperCase();
-            if (col0.includes('TOTAL')) {
-              totalRow = row;
-              continue;
-            }
-
+            if (String(row[0] || '').trim().toUpperCase().includes('TOTAL')) { totalRow = row; continue; }
             const rawDate = String(row[1] || '').trim();
             if (rawDate && (rawDate.includes('/') || rawDate.includes('-'))) {
-              dailyDates.push(rawDate.substring(0, 10));
-              dailyCA26.push(parseNum(row[2]));
-              dailyNuits26.push(parseNum(row[5]));
-              dailyCA25.push(parseNum(row[16]));
-              dailyNuits25.push(parseNum(row[19]));
-              // Récupérer la dispo à date
+              dates.push(rawDate.substring(0, 10));
+              ca26.push(parseNum(row[2])); nuits26.push(parseNum(row[5]));
+              ca25.push(parseNum(row[16])); nuits25.push(parseNum(row[19]));
               derniereDispo = parseNum(row[7]);
             }
           }
 
           if (totalRow) {
-            const ca26 = parseNum(totalRow[2]);
-            const pm26 = parseNum(totalRow[3]);
-            const to26 = parseNum(totalRow[4]);
-            const nuits26 = parseNum(totalRow[5]);
-            const revpar26 = parseNum(totalRow[6]);
+            const c26 = parseNum(totalRow[2]), p26 = parseNum(totalRow[3]), n26 = parseNum(totalRow[5]), r26 = parseNum(totalRow[6]);
+            const c25 = parseNum(totalRow[16]), p25 = parseNum(totalRow[17]), n25 = parseNum(totalRow[19]), r25 = parseNum(totalRow[20]);
 
-            const ca25 = parseNum(totalRow[16]);
-            const pm25 = parseNum(totalRow[17]);
-            const to25 = parseNum(totalRow[18]);
-            const nuits25 = parseNum(totalRow[19]);
-            const revpar25 = parseNum(totalRow[20]);
+            document.getElementById('res-ca-n').innerText = Math.round(c26).toLocaleString('fr-FR') + ' €';
+            document.getElementById('res-ca-n1').innerText = Math.round(c25).toLocaleString('fr-FR') + ' €';
+            formaterDelta('res-delta-ca', c26, c25);
 
-            document.getElementById('res-ca-n').innerText = Math.round(ca26).toLocaleString('fr-FR') + ' €';
-            document.getElementById('res-ca-n1').innerText = Math.round(ca25).toLocaleString('fr-FR') + ' €';
-            formaterDelta('res-delta-ca', ca26, ca25);
+            document.getElementById('res-pm-n').innerText = p26.toFixed(2) + ' €';
+            document.getElementById('res-pm-n1').innerText = p25.toFixed(2) + ' €';
+            formaterDelta('res-delta-pm', p26, p25);
 
-            document.getElementById('res-pm-n').innerText = pm26.toFixed(2) + ' €';
-            document.getElementById('res-pm-n1').innerText = pm25.toFixed(2) + ' €';
-            formaterDelta('res-delta-pm', pm26, pm25);
+            document.getElementById('res-nuits-n').innerText = Math.round(n26).toLocaleString('fr-FR') + ' nts';
+            document.getElementById('res-nuits-n1').innerText = Math.round(n25).toLocaleString('fr-FR') + ' nts';
 
-            document.getElementById('res-nuits-n').innerText = Math.round(nuits26).toLocaleString('fr-FR') + ' nts';
-            document.getElementById('res-nuits-n1').innerText = Math.round(nuits25).toLocaleString('fr-FR') + ' nts';
+            document.getElementById('res-revpar-n').innerText = r26.toFixed(2) + ' €';
+            document.getElementById('res-revpar-n1').innerText = r25.toFixed(2) + ' €';
 
-            document.getElementById('res-revpar-n').innerText = revpar26.toFixed(2) + ' €';
-            document.getElementById('res-revpar-n1').innerText = revpar25.toFixed(2) + ' €';
-
-            // Indicateurs hybrides Seniors & Zénao
             const dispoAffichee = Math.max(0, derniereDispo);
             document.getElementById('res-dispo-zenao').innerText = `${dispoAffichee} apparts`;
             document.getElementById('res-to-senior').innerText = '89.4%';
@@ -488,40 +448,39 @@
             const tension = document.getElementById('res-statut-tension');
             if (dispoAffichee <= 3) {
               tension.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-bold uppercase bg-rose-100 text-rose-800';
-              tension.innerText = 'Stock Sous Tension Critique';
+              tension.innerText = 'Stock Critique (Tension Max)';
             } else {
               tension.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-bold uppercase bg-emerald-100 text-emerald-800';
-              tension.innerText = 'Stock Fluide & Disponible';
+              tension.innerText = 'Stock Fluide & Équilibré';
             }
 
-            // GOPAR Net estimé (RevPAR - coûts de ménage variables)
-            const gopar = Math.max(0, revpar26 * 0.76).toFixed(2);
+            const gopar = Math.max(0, r26 * 0.76).toFixed(2);
             document.getElementById('res-gopar').innerText = `${gopar} €`;
 
-            // Diagnostic & Consigne IA
+            // Recommandation IA & MLOS
             const box = document.getElementById('res-ai-box');
             const title = document.getElementById('res-ai-title');
             const text = document.getElementById('res-ai-text');
-            const deltaCA = ca25 > 0 ? ((ca26 - ca25) / ca25) * 100 : 0;
+            const deltaCA = c25 > 0 ? ((c26 - c25) / c25) * 100 : 0;
 
             if (dispoAffichee <= 3) {
               box.className = 'bg-rose-50 p-6 rounded-2xl border-l-8 border-rose-500 shadow-sm space-y-2';
-              title.innerText = `${nom} : Stock critique (${dispoAffichee} dispos) ➔ Hausse Prix Moyen`;
-              text.innerText = `Cet établissement enregistre un CA de ${Math.round(ca26).toLocaleString('fr-FR')} €. Le stock résiduel est en tension. Consigne : remonter les tarifs de +20% sur Booking/Expedia et fermer le court séjour 1 nuit (MLOS 2) pour maximiser le GOPAR.`;
+              title.innerText = `${nom} : Alerte Stock Critique (${dispoAffichee} dispos) ➔ MLOS 2 & Hausse Prix`;
+              text.innerText = `Le taux d'occupation Zénao sature. Recommandation IA : Activer un Séjour Minimum de 2 nuits (MLOS 2) pour éliminer les micro-séjours peu rentables et majorer les tarifs de +20% sur les OTAs.`;
             } else if (deltaCA < -10) {
               box.className = 'bg-amber-50 p-6 rounded-2xl border-l-8 border-amber-500 shadow-sm space-y-2';
-              title.innerText = `${nom} : Retard d'activité (-${Math.abs(deltaCA).toFixed(1)}%) ➔ Arbitrage Moyen Séjour`;
-              text.innerText = `Le chiffre d'affaires est en retrait par rapport à N-1. Recommandation d'arbitrage : allouer 4 à 6 appartements vacants vers des baux étudiants ou professionnels temporaires à loyer garanti pour couvrir les charges fixes.`;
+              title.innerText = `${nom} : Retard CA (-${Math.abs(deltaCA).toFixed(1)}%) ➔ Arbitrage Long Séjour`;
+              text.innerText = `Volume en retrait par rapport à N-1. Recommandation IA : Basculer 4 à 6 unités vacantes vers des baux temporaires (étudiants / entreprises) pour sécuriser un fond de revenu garanti sans éroder le GOPAR.`;
             } else {
               box.className = 'bg-emerald-50 p-6 rounded-2xl border-l-8 border-emerald-500 shadow-sm space-y-2';
-              title.innerText = `${nom} : Régime de croisière équilibré (CA : ${Math.round(ca26).toLocaleString('fr-FR')} €)`;
-              text.innerText = `Activité en croissance (+${deltaCA.toFixed(1)}%). Maintenir les barèmes tarifaires en place et surveiller le rythme des réservations de dernière minute.`;
+              title.innerText = `${nom} : Croissance stable et équilibrée (CA : ${Math.round(c26).toLocaleString('fr-FR')} €)`;
+              text.innerText = `Dynamique positive (+${deltaCA.toFixed(1)}%). Maintenir la grille tarifaire actuelle et conserver un stock tampon pour les réservations de dernière minute.`;
             }
           }
 
-          document.getElementById('titre-chart-res-ca').innerText = `${nom} : CA Journalier 2026 vs 2025`;
-          document.getElementById('titre-chart-res-nuits').innerText = `${nom} : Nuitées Vendues par Jour`;
-          tracerGraphiquesResidence(dailyDates, dailyCA26, dailyCA25, dailyNuits26, dailyNuits25);
+          document.getElementById('titre-chart-res-ca').innerText = `${nom} : Évolution CA (2026 vs 2025)`;
+          document.getElementById('titre-chart-res-nuits').innerText = `${nom} : Nuitées par Jour (2026 vs 2025)`;
+          tracerGraphiquesResidence(dates, ca26, ca25, nuits26, nuits25);
         }
       });
     }
@@ -534,7 +493,7 @@
           labels: dates,
           datasets: [
             { label: 'CA 2026 (€)', data: ca26, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.08)', fill: true, tension: 0.1 },
-            { label: 'CA 2025 N-1 (€)', data: ca25, borderColor: '#94a3b8', borderDash: [4, 4], fill: false, tension: 0.1 }
+            { label: 'CA 2025 (€)', data: ca25, borderColor: '#94a3b8', borderDash: [4, 4], fill: false, tension: 0.1 }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false }
@@ -547,21 +506,21 @@
           labels: dates,
           datasets: [
             { label: 'Nuitées 2026', data: nuits26, backgroundColor: '#4f46e5', borderRadius: 2 },
-            { label: 'Nuitées 2025 N-1', data: nuits25, backgroundColor: '#cbd5e1', borderRadius: 2 }
+            { label: 'Nuitées 2025', data: nuits25, backgroundColor: '#cbd5e1', borderRadius: 2 }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false }
       });
     }
 
-    // 3. INITIALISATION & CARTE
+    // 3. CARTE & FILTRES
     function initSelecteur() {
       const select = document.getElementById('select-residence');
       select.innerHTML = '';
       Object.keys(RESIDENCES).sort().forEach(nom => {
         const opt = document.createElement('option');
         opt.value = nom;
-        opt.innerText = `${nom} (${RESIDENCES[nom].marque})`;
+        opt.innerText = `${nom} (${RESIDENCES[nom].marque} - ${RESIDENCES[nom].region})`;
         select.appendChild(opt);
       });
     }
@@ -570,10 +529,10 @@
       if (mapInstance) mapInstance.remove();
       mapInstance = L.map('map-france').setView([46.7, 2.5], 5.8);
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(mapInstance);
-      filtrerCarte();
+      filtrerRéseau();
     }
 
-    function filtrerCarte() {
+    function filtrerRéseau() {
       if (!mapInstance) return;
       mapInstance.eachLayer(l => { if (l instanceof L.CircleMarker) mapInstance.removeLayer(l); });
 
@@ -588,24 +547,24 @@
 
         const pt = COORDS[nom] || [46.5, 2.5];
         L.circleMarker(pt, { radius: 7, fillColor: '#2563eb', color: '#fff', weight: 2, fillOpacity: 0.9 })
-          .bindPopup(`<strong>${nom}</strong><br>Marque : ${info.marque}<br>Région : ${info.region}<br><button onclick="selectionnerDepuisCarte('${nom}')" class="mt-2 text-xs font-bold text-blue-600 underline">Voir les 365 jours de cette résidence ➔</button>`)
+          .bindPopup(`<strong>${nom}</strong><br>Marque : ${info.marque}<br>Région : ${info.region}<br><button onclick="voirResidenceDepuisCarte('${nom}')" class="mt-2 text-xs font-bold text-blue-600 underline">Voir l'analyse Micro & IA ➔</button>`)
           .addTo(mapInstance);
       });
 
       document.getElementById('compteur-residences').innerText = `${count} résidences affichées`;
     }
 
-    function selectionnerDepuisCarte(nom) {
+    function voirResidenceDepuisCarte(nom) {
       document.getElementById('select-residence').value = nom;
       changerOnglet('micro');
       chargerDonneesResidence();
     }
 
-    window.onload = function() {
-      initSelecteur();
-      initCarte();
-      chargerDonneesNationales();
-    };
+    function changerResidence() {
+      chargerDonneesResidence();
+    }
+
+    window.onload = chargerToutesLesDonnees;
   </script>
 </body>
 </html>
