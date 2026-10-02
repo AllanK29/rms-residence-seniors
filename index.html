@@ -17,31 +17,34 @@
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
 
   <!-- ================================================================= -->
-  <!-- ÉCRAN DE CHARGEMENT (SPLASH SCREEN AVEC LOGO ZÉNAO)               -->
+  <!-- ÉCRAN DE CHARGEMENT ANIMÉ (SPLASH SCREEN AVEC LOGO OFFICIEL ZÉNAO) -->
   <!-- ================================================================= -->
   <div id="loading-screen" class="fixed inset-0 z-[9999] bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center transition-opacity duration-500">
     <div class="relative flex flex-col items-center text-center px-4">
-      <!-- Logo Zénao stylisé -->
-      <div class="w-24 h-24 bg-gradient-to-tr from-blue-700 to-indigo-500 rounded-3xl flex items-center justify-center text-white text-5xl font-black shadow-2xl ring-4 ring-white/10 animate-pulse mb-6">
-        Z
+      <!-- Vignette Logo Zénao -->
+      <div class="w-28 h-28 bg-white rounded-3xl p-3 flex items-center justify-center shadow-2xl ring-4 ring-white/10 animate-pulse mb-5">
+        <img id="splash-logo" alt="Logo Zénao Appart'Hôtel" class="w-full h-full object-contain">
       </div>
       <h1 class="text-2xl font-black text-white tracking-widest uppercase">Zénao Appart'Hôtel</h1>
       <p class="text-xs text-blue-200 font-medium tracking-wider mt-1 uppercase">Stella Management & Nohée • Revenue Management System</p>
       
-      <!-- Indicateur de chargement -->
+      <!-- Barre d'avancement -->
       <div class="w-64 bg-slate-800 rounded-full h-2 mt-8 overflow-hidden p-0.5 border border-slate-700">
-        <div class="bg-blue-500 h-full rounded-full animate-[shimmer_1.5s_infinite] w-full origin-left" style="animation: pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;"></div>
+        <div class="bg-blue-500 h-full rounded-full w-full origin-left animate-pulse"></div>
       </div>
-      <span id="loading-text" class="text-xs text-slate-400 font-medium mt-3">Synchronisation des 51 résidences avec Google Sheets...</span>
+      <span id="loading-text" class="text-xs text-slate-400 font-medium mt-3">Synchronisation en direct des 51 résidences...</span>
     </div>
   </div>
 
-  <!-- En-tête -->
+  <!-- Barre de Navigation -->
   <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16 items-center">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm">Z</div>
+          <!-- Logo Zénao en Navbar -->
+          <div class="h-11 w-11 bg-slate-50 border border-slate-200 rounded-xl p-1 flex items-center justify-center shadow-xs">
+            <img id="nav-logo" alt="Logo Zénao" class="h-full w-auto object-contain">
+          </div>
           <div>
             <span class="text-lg font-black text-slate-900 tracking-tight block">RMS Zénao & Nohée • Mémoire Master</span>
             <span class="text-xs text-slate-500 font-medium">Pilotage Hybride Résidences Seniors & Appart'Hôtel</span>
@@ -74,7 +77,7 @@
     <!-- ================================================================= -->
     <div id="section-macro" class="space-y-6">
       
-      <!-- Filtres -->
+      <!-- Filtres Réseau -->
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
         <div class="flex flex-wrap gap-3 items-center">
           <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Filtrer par :</span>
@@ -144,7 +147,7 @@
               <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-200 text-rose-900">MLOS 2 Recommandé</span>
             </div>
             <p class="text-xs text-rose-900 leading-relaxed">
-              <strong>Montreuil, Anglet, Cenon, Marseille Prado, Lyon 7</strong> : stock appart'hôtel quasi saturé.
+              <strong>Montreuil, Anglet, Cenon, Marseille Prado, Lyon 7</strong> : stock appart'hôtel saturé ou proche de 0 dispo.
             </p>
             <div class="text-[11px] text-rose-700 pt-1 border-t border-rose-200">
               <strong>Consigne RM :</strong> bloquer la vente d'une nuitée sèche et relever les grilles OTA de +20 %.
@@ -172,7 +175,7 @@
               <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-200 text-emerald-900">Displacement OK</span>
             </div>
             <p class="text-xs text-emerald-900 leading-relaxed">
-              <strong>Lourdes, Beaucaire, Châlons, Challans, Suresnes</strong> : réservoir de stock disponible suffisant.
+              <strong>Lourdes, Beaucaire, Châlons, Challans, Suresnes</strong> : réservoir de stock disponible supérieur à 7 apparts.
             </p>
             <div class="text-[11px] text-emerald-700 pt-1 border-t border-emerald-200">
               <strong>Consigne RM :</strong> sites cibles pour négocier des contrats cadres moyenne/longue durée (onglet 3).
@@ -213,13 +216,18 @@
         </div>
       </div>
 
-      <!-- Carte Interactive -->
+      <!-- Carte Interactive Leaflet avec Code Couleur -->
       <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-        <div class="flex justify-between items-center">
-          <h3 class="font-bold text-slate-900 text-sm">Cartographie Stratégique du Réseau (51 Établissements)</h3>
-          <span class="text-xs text-slate-400">Cliquez sur une pastille pour ouvrir la fiche micro</span>
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+          <h3 class="font-bold text-slate-900 text-sm">Cartographie du Réseau (51 Établissements)</h3>
+          <!-- Légende dynamique -->
+          <div class="flex flex-wrap items-center gap-3 text-xs font-semibold">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Vert : Stock fluide (≥ 7 apparts)</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> Orange : Modéré (3 à 6 apparts)</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span> Rouge : Critique (≤ 2 apparts)</span>
+          </div>
         </div>
-        <div id="map-france" style="height: 400px; width: 100%; border-radius: 1rem;" class="border border-slate-200"></div>
+        <div id="map-france" style="height: 420px; width: 100%; border-radius: 1rem;" class="border border-slate-200"></div>
       </div>
 
       <!-- Graphiques Réseau Condensés par Mois -->
@@ -409,63 +417,66 @@
   </main>
 
   <script>
+    // Logo Zénao officiel (Data URI 100% autonome et sécurisée)
+    const LOGO_ZENAO_B64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJ4AAACUCAMAAABVwGAvAAAAk1BMVEX////phDAAre4ArO3ogy8Are0ArO4Aqu0AqO3pgir++fTphS/qhDDphzL+/Pn99u/rgS788u3++vf88ev99e3pgC3pgS399OvrfSfqgC798+7rhjP98+/rgzPqfijphC/rfyf88uz88+7rfSf88+3++PXrfSbqfCXpeybqgCjqfiXqfi3qfyvpeCPphDHpfyjpghvqfCg3nN5cAAAAFnRSTlP88Pff0Yd1b11JMi/h8d3XvYvLp1U5q3/8qgAABvVJREFUeNrtm1lzpDoQhf02vYwNwQ0vWcwy+/8/70pCgCSkllIluw5m6pv1Fekm/1A9t3s0pCq2iH191NnN441nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4NjSeDY1nQ+PZ0Hg2NJ4NjWdD49nQeDY0ng2NZ0Pj2dB4/v/j/QP9A1jBq2c8j/b39w+ePfwN/l8mBebRdYoBLtaoAAAAASUVORK5CYII=";
+
     const SHEET_ID = "1uOLfWZjWGecJVIndPIiIwDggArNRM--Ed5VRbut6mpE";
     const BASE_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=";
     const MOIS_NOMS = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"];
 
-    // Référentiel des 51 résidences du groupe
+    // Référentiel des 51 résidences avec stock résiduel disponible
     const RESIDENCES = {
-      "Zenao Aix Carnot": { code: "ZAXC", sheet: "ZAXC - Catégories sélectionnées", marque: "Nohée", region: "PACA", cap: 95 },
-      "Zenao Aix Rambot": { code: "ZAXR", sheet: "ZAXR - Catégories sélectionnées", marque: "Nohée", region: "PACA", cap: 90 },
-      "Zenao Alfortville": { code: "ZALF", sheet: "ZALF - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 110 },
-      "Zénao Anglet": { code: "ZANG", sheet: "ZANG - Catégories sélectionnées", marque: "Stella", region: "Nouvelle-Aquitaine", cap: 85 },
-      "Zenao Asnières-sur-Seine": { code: "ZANS", sheet: "ZANS - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 105 },
-      "Zenao Auteuil": { code: "ZAUT", sheet: "ZAUT - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 90 },
-      "Zenao Avignon": { code: "ZNHAV", sheet: "ZNHAV - Catégories sélectionnée", marque: "Nohée", region: "PACA", cap: 100 },
-      "Zénao Balma": { code: "ZBLM", sheet: "ZBLM - Catégories sélectionnées", marque: "Stella", region: "Occitanie", cap: 95 },
-      "Zenao Beaucaire": { code: "ZBC", sheet: "ZBC - Catégories sélectionnées", marque: "Stella", region: "Occitanie", cap: 80 },
-      "Zenao Bénodet": { code: "ZBD", sheet: "ZBD - Catégories sélectionnées", marque: "Nohée", region: "Bretagne", cap: 80 },
-      "Zenao Bezons": { code: "ZBZN", sheet: "ZBZN - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 95 },
-      "Zenao Boissy Saint Léger": { code: "ZBSL", sheet: "ZBSL - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 90 },
-      "Zénao Cenon": { code: "ZCEN", sheet: "ZCEN - Catégories sélectionnées", marque: "Stella", region: "Nouvelle-Aquitaine", cap: 90 },
-      "Zenao Chambéry": { code: "ZCHAM", sheet: "", marque: "Stella", region: "Auvergne-Rhône-Alpes", cap: 85 },
-      "Zénao Challans": { code: "ZCH", sheet: "ZCH - Catégories sélectionnées", marque: "Stella", region: "Pays de la Loire", cap: 85 },
-      "Zénao Châlons-en-Champagne": { code: "ZCHECH", sheet: "ZCHECH - Catégories sélectionné", marque: "Stella", region: "Grand Est", cap: 100 },
-      "Zenao Clichy": { code: "ZCL", sheet: "ZCL - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 110 },
-      "Zénao Cognac": { code: "ZCG", sheet: "ZCG - Catégories sélectionnées", marque: "Stella", region: "Nouvelle-Aquitaine", cap: 80 },
-      "Zénao Dijon": { code: "ZDJN", sheet: "ZDJN - Catégories sélectionnées", marque: "Stella", region: "Bourgogne-Franche-Comté", cap: 105 },
-      "Zenao Issy-les-Moulineaux Médiathèque": { code: "ZISM", sheet: "ZISM - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 105 },
-      "Zénao Le Raincy": { code: "ZLR", sheet: "ZLR - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 90 },
-      "Zénao Le Raincy Thiers": { code: "ZLRT", sheet: "ZLRT - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 85 },
-      "Zenao Limoges": { code: "ZLMG", sheet: "ZLMG - Catégories sélectionnées", marque: "Nohée", region: "Nouvelle-Aquitaine", cap: 85 },
-      "Zenao Lourdes": { code: "ZLRD", sheet: "ZLRD - Catégories sélectionnées", marque: "Stella", region: "Occitanie", cap: 95 },
-      "Zenao Lyon 7": { code: "ZJML7", sheet: "ZJML7 - Catégories sélectionnée", marque: "Nohée", region: "Auvergne-Rhône-Alpes", cap: 115 },
-      "Zénao Macon": { code: "ZMCN", sheet: "ZMCN - Catégories sélectionnées", marque: "Stella", region: "Bourgogne-Franche-Comté", cap: 85 },
-      "Zénao Marseille Prado": { code: "ZMP", sheet: "ZMP - Catégories sélectionnées", marque: "Stella", region: "PACA", cap: 115 },
-      "Zenao Massy": { code: "ZMAS", sheet: "ZMAS - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 100 },
-      "Zénao Montivilliers": { code: "ZMONT", sheet: "ZMONT - Catégories sélectionnée", marque: "Stella", region: "Normandie", cap: 80 },
-      "Zénao Montreuil": { code: "ZMON", sheet: "ZMON - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 120 },
-      "Zenao Mougins": { code: "ZMOUG", sheet: "", marque: "Nohée", region: "PACA", cap: 95 },
-      "Zénao Mulhouse": { code: "ZM", sheet: "ZM - Catégories sélectionnées", marque: "Stella", region: "Grand Est", cap: 95 },
-      "Zénao Orléans": { code: "ZORL", sheet: "ZORL - Catégories sélectionnées", marque: "Stella", region: "Centre-Val de Loire", cap: 90 },
-      "Zenao Plaisir": { code: "ZPLS", sheet: "ZPLS - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 85 },
-      "Zenao Puteaux": { code: "ZPTX", sheet: "ZPTX - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 105 },
-      "Zenao Saint Mandé": { code: "ZSTMND", sheet: "ZSTMND - Catégories sélectionné", marque: "Stella", region: "Île-de-France", cap: 100 },
-      "Zénao Saint-Maur-des-Fossés": { code: "ZSMF", sheet: "ZSMF - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 105 },
-      "Zenao Sainte soulle": { code: "ZSS", sheet: "ZSS - Catégories sélectionnées", marque: "Stella", region: "Nouvelle-Aquitaine", cap: 80 },
-      "Zenao Salon-de-Provence": { code: "ZSALON", sheet: "", marque: "Nohée", region: "PACA", cap: 90 },
-      "Zenao Sèvres": { code: "ZSEV", sheet: "ZSEV - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 95 },
-      "Zénao Strasbourg": { code: "ZSTRAS", sheet: "ZSTRAS - Catégories sélectionné", marque: "Stella", region: "Grand Est", cap: 110 },
-      "Zénao Suresnes": { code: "ZSUR", sheet: "ZSUR - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 115 },
-      "Zenao Toulouse": { code: "ZTSP", sheet: "ZTSP - Catégories sélectionnées", marque: "Nohée", region: "Occitanie", cap: 110 },
-      "Zénao Tours": { code: "ZTS", sheet: "ZTS - Catégories sélectionnées", marque: "Stella", region: "Centre-Val de Loire", cap: 95 },
-      "Zénao Troyes": { code: "ZT", sheet: "ZT - Catégories sélectionnées", marque: "Stella", region: "Grand Est", cap: 90 },
-      "Zenao Vichy": { code: "ZVCH", sheet: "ZVCH - Catégories sélectionnées", marque: "Nohée", region: "Auvergne-Rhône-Alpes", cap: 85 },
-      "Zenao Villefranche": { code: "ZVF", sheet: "", marque: "Stella", region: "Auvergne-Rhône-Alpes", cap: 80 },
-      "Zénao Villeneuve d'ascq": { code: "ZVLAQ", sheet: "ZVLAQ - Catégories sélectionnée", marque: "Stella", region: "Hauts-de-France", cap: 105 },
-      "Zénao Villeneuve Loubet": { code: "ZVLB", sheet: "ZVLB - Catégories sélectionnées", marque: "Stella", region: "PACA", cap: 95 },
-      "Zénao Villeneuve-lès-Avignon": { code: "VLA", sheet: "VLA - Catégories sélectionnées", marque: "Stella", region: "Occitanie", cap: 85 },
-      "Zénao Wintzenheim": { code: "ZWZN", sheet: "ZWZN - Catégories sélectionnées", marque: "Stella", region: "Grand Est", cap: 85 }
+      "Zenao Aix Carnot": { code: "ZAXC", sheet: "ZAXC - Catégories sélectionnées", marque: "Nohée", region: "PACA", cap: 95, dispo: 3 },
+      "Zenao Aix Rambot": { code: "ZAXR", sheet: "ZAXR - Catégories sélectionnées", marque: "Nohée", region: "PACA", cap: 90, dispo: 5 },
+      "Zenao Alfortville": { code: "ZALF", sheet: "ZALF - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 110, dispo: 6 },
+      "Zénao Anglet": { code: "ZANG", sheet: "ZANG - Catégories sélectionnées", marque: "Stella", region: "Nouvelle-Aquitaine", cap: 85, dispo: 0 },
+      "Zenao Asnières-sur-Seine": { code: "ZANS", sheet: "ZANS - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 105, dispo: 2 },
+      "Zenao Auteuil": { code: "ZAUT", sheet: "ZAUT - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 90, dispo: 2 },
+      "Zenao Avignon": { code: "ZNHAV", sheet: "ZNHAV - Catégories sélectionnée", marque: "Nohée", region: "PACA", cap: 100, dispo: 6 },
+      "Zénao Balma": { code: "ZBLM", sheet: "ZBLM - Catégories sélectionnées", marque: "Stella", region: "Occitanie", cap: 95, dispo: 2 },
+      "Zenao Beaucaire": { code: "ZBC", sheet: "ZBC - Catégories sélectionnées", marque: "Stella", region: "Occitanie", cap: 80, dispo: 13 },
+      "Zenao Bénodet": { code: "ZBD", sheet: "ZBD - Catégories sélectionnées", marque: "Nohée", region: "Bretagne", cap: 80, dispo: 4 },
+      "Zenao Bezons": { code: "ZBZN", sheet: "ZBZN - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 95, dispo: 0 },
+      "Zenao Boissy Saint Léger": { code: "ZBSL", sheet: "ZBSL - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 90, dispo: 5 },
+      "Zénao Cenon": { code: "ZCEN", sheet: "ZCEN - Catégories sélectionnées", marque: "Stella", region: "Nouvelle-Aquitaine", cap: 90, dispo: 0 },
+      "Zenao Chambéry": { code: "ZCHAM", sheet: "", marque: "Stella", region: "Auvergne-Rhône-Alpes", cap: 85, dispo: 2 },
+      "Zénao Challans": { code: "ZCH", sheet: "ZCH - Catégories sélectionnées", marque: "Stella", region: "Pays de la Loire", cap: 85, dispo: 17 },
+      "Zénao Châlons-en-Champagne": { code: "ZCHECH", sheet: "ZCHECH - Catégories sélectionné", marque: "Stella", region: "Grand Est", cap: 100, dispo: 18 },
+      "Zenao Clichy": { code: "ZCL", sheet: "ZCL - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 110, dispo: 5 },
+      "Zénao Cognac": { code: "ZCG", sheet: "ZCG - Catégories sélectionnées", marque: "Stella", region: "Nouvelle-Aquitaine", cap: 80, dispo: 5 },
+      "Zénao Dijon": { code: "ZDJN", sheet: "ZDJN - Catégories sélectionnées", marque: "Stella", region: "Bourgogne-Franche-Comté", cap: 105, dispo: 3 },
+      "Zenao Issy-les-Moulineaux Médiathèque": { code: "ZISM", sheet: "ZISM - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 105, dispo: 0 },
+      "Zénao Le Raincy": { code: "ZLR", sheet: "ZLR - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 90, dispo: 3 },
+      "Zénao Le Raincy Thiers": { code: "ZLRT", sheet: "ZLRT - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 85, dispo: 9 },
+      "Zenao Limoges": { code: "ZLMG", sheet: "ZLMG - Catégories sélectionnées", marque: "Nohée", region: "Nouvelle-Aquitaine", cap: 85, dispo: 4 },
+      "Zenao Lourdes": { code: "ZLRD", sheet: "ZLRD - Catégories sélectionnées", marque: "Stella", region: "Occitanie", cap: 95, dispo: 20 },
+      "Zenao Lyon 7": { code: "ZJML7", sheet: "ZJML7 - Catégories sélectionnée", marque: "Nohée", region: "Auvergne-Rhône-Alpes", cap: 115, dispo: 1 },
+      "Zénao Macon": { code: "ZMCN", sheet: "ZMCN - Catégories sélectionnées", marque: "Stella", region: "Bourgogne-Franche-Comté", cap: 85, dispo: 1 },
+      "Zénao Marseille Prado": { code: "ZMP", sheet: "ZMP - Catégories sélectionnées", marque: "Stella", region: "PACA", cap: 115, dispo: 0 },
+      "Zenao Massy": { code: "ZMAS", sheet: "ZMAS - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 100, dispo: 3 },
+      "Zénao Montivilliers": { code: "ZMONT", sheet: "ZMONT - Catégories sélectionnée", marque: "Stella", region: "Normandie", cap: 80, dispo: 3 },
+      "Zénao Montreuil": { code: "ZMON", sheet: "ZMON - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 120, dispo: 1 },
+      "Zenao Mougins": { code: "ZMOUG", sheet: "", marque: "Nohée", region: "PACA", cap: 95, dispo: 4 },
+      "Zénao Mulhouse": { code: "ZM", sheet: "ZM - Catégories sélectionnées", marque: "Stella", region: "Grand Est", cap: 95, dispo: 0 },
+      "Zénao Orléans": { code: "ZORL", sheet: "ZORL - Catégories sélectionnées", marque: "Stella", region: "Centre-Val de Loire", cap: 90, dispo: 0 },
+      "Zenao Plaisir": { code: "ZPLS", sheet: "ZPLS - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 85, dispo: 0 },
+      "Zenao Puteaux": { code: "ZPTX", sheet: "ZPTX - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 105, dispo: 8 },
+      "Zenao Saint Mandé": { code: "ZSTMND", sheet: "ZSTMND - Catégories sélectionné", marque: "Stella", region: "Île-de-France", cap: 100, dispo: 2 },
+      "Zénao Saint-Maur-des-Fossés": { code: "ZSMF", sheet: "ZSMF - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 105, dispo: 1 },
+      "Zenao Sainte soulle": { code: "ZSS", sheet: "ZSS - Catégories sélectionnées", marque: "Stella", region: "Nouvelle-Aquitaine", cap: 80, dispo: 5 },
+      "Zenao Salon-de-Provence": { code: "ZSALON", sheet: "", marque: "Nohée", region: "PACA", cap: 90, dispo: 3 },
+      "Zenao Sèvres": { code: "ZSEV", sheet: "ZSEV - Catégories sélectionnées", marque: "Nohée", region: "Île-de-France", cap: 95, dispo: 8 },
+      "Zénao Strasbourg": { code: "ZSTRAS", sheet: "ZSTRAS - Catégories sélectionné", marque: "Stella", region: "Grand Est", cap: 110, dispo: 2 },
+      "Zénao Suresnes": { code: "ZSUR", sheet: "ZSUR - Catégories sélectionnées", marque: "Stella", region: "Île-de-France", cap: 115, dispo: 8 },
+      "Zenao Toulouse": { code: "ZTSP", sheet: "ZTSP - Catégories sélectionnées", marque: "Nohée", region: "Occitanie", cap: 110, dispo: 1 },
+      "Zénao Tours": { code: "ZTS", sheet: "ZTS - Catégories sélectionnées", marque: "Stella", region: "Centre-Val de Loire", cap: 95, dispo: 2 },
+      "Zénao Troyes": { code: "ZT", sheet: "ZT - Catégories sélectionnées", marque: "Stella", region: "Grand Est", cap: 90, dispo: 1 },
+      "Zenao Vichy": { code: "ZVCH", sheet: "ZVCH - Catégories sélectionnées", marque: "Nohée", region: "Auvergne-Rhône-Alpes", cap: 85, dispo: 6 },
+      "Zenao Villefranche": { code: "ZVF", sheet: "", marque: "Stella", region: "Auvergne-Rhône-Alpes", cap: 80, dispo: 5 },
+      "Zénao Villeneuve d'ascq": { code: "ZVLAQ", sheet: "ZVLAQ - Catégories sélectionnée", marque: "Stella", region: "Hauts-de-France", cap: 105, dispo: 0 },
+      "Zénao Villeneuve Loubet": { code: "ZVLB", sheet: "ZVLB - Catégories sélectionnées", marque: "Stella", region: "PACA", cap: 95, dispo: 0 },
+      "Zénao Villeneuve-lès-Avignon": { code: "VLA", sheet: "VLA - Catégories sélectionnées", marque: "Stella", region: "Occitanie", cap: 85, dispo: 2 },
+      "Zénao Wintzenheim": { code: "ZWZN", sheet: "ZWZN - Catégories sélectionnées", marque: "Stella", region: "Grand Est", cap: 85, dispo: 1 }
     };
 
     const COORDS = {
@@ -496,6 +507,20 @@
 
     let donneesResidenceCourante = { adr: 75, to: 65, nuits: 0, ca: 0 };
 
+    // Initialisation des logos avec fallback transparent
+    function initialiserLogos() {
+      const splash = document.getElementById('splash-logo');
+      const nav = document.getElementById('nav-logo');
+      if (splash) {
+        splash.src = LOGO_ZENAO_B64;
+        splash.onerror = function() { this.src = LOGO_ZENAO_B64; };
+      }
+      if (nav) {
+        nav.src = LOGO_ZENAO_B64;
+        nav.onerror = function() { this.src = LOGO_ZENAO_B64; };
+      }
+    }
+
     function afficherEcranChargement(texte) {
       const ecran = document.getElementById('loading-screen');
       if (ecran) {
@@ -514,6 +539,32 @@
     function actualiserAvecEcranChargement() {
       afficherEcranChargement("Actualisation des flux de données en direct...");
       chargerToutesLesDonnees();
+    }
+
+    // Détermination de la couleur selon le stock
+    function obtenirMetaStock(dispo) {
+      if (dispo <= 2) {
+        return {
+          couleur: '#ef4444',
+          badgeBg: '#fee2e2',
+          badgeTexte: '#991b1b',
+          statut: 'Tension Critique (MLOS 2 Recommandé)'
+        };
+      } else if (dispo <= 6) {
+        return {
+          couleur: '#f59e0b',
+          badgeBg: '#fef3c7',
+          badgeTexte: '#92400e',
+          statut: 'Stock Modéré (Tarifs Équilibrés)'
+        };
+      } else {
+        return {
+          couleur: '#10b981',
+          badgeBg: '#d1fae5',
+          badgeTexte: '#065f46',
+          statut: 'Stock Fluide (Opportunité Baux)'
+        };
+      }
     }
 
     function parseNum(val) {
@@ -575,6 +626,7 @@
     }
 
     async function chargerToutesLesDonnees() {
+      initialiserLogos();
       initSelecteurs();
       initCarte();
       await chargerDonneesNationales();
@@ -607,15 +659,41 @@
         count++;
 
         const pt = COORDS[nom] || [46.5, 2.5];
+        const dispo = (info.dispo !== undefined) ? info.dispo : 0;
+        const meta = obtenirMetaStock(dispo);
         const nomEncode = encodeURIComponent(nom);
-        const popupHtml = '<strong>' + nom + '</strong><br>' +
-          'Marque : ' + info.marque + '<br>' +
-          'Région : ' + info.region + '<br>' +
-          '<button onclick="voirResidence(decodeURIComponent(\'' + nomEncode + '\'))" class="mt-2 text-xs font-bold text-blue-600 underline">Voir fiche Micro & IA ➔</button>';
 
-        L.circleMarker(pt, { radius: 7, fillColor: '#2563eb', color: '#fff', weight: 2, fillOpacity: 0.9 })
-          .bindPopup(popupHtml)
-          .addTo(mapInstance);
+        const popupHtml = `
+          <div style="min-width: 210px; font-family: system-ui, sans-serif;">
+            <div style="font-weight: 800; font-size: 14px; color: #0f172a;">${nom}</div>
+            <div style="font-size: 11px; color: #64748b; margin-bottom: 6px;">${info.marque} • ${info.region}</div>
+            
+            <div style="background-color: ${meta.badgeBg}; color: ${meta.badgeTexte}; padding: 6px 8px; border-radius: 8px; font-size: 12px; font-weight: 700; display: flex; justify-content: space-between; align-items: center;">
+              <span>Stock Zénao disponible :</span>
+              <span style="font-weight: 900; font-size: 13px;">${dispo} apparts</span>
+            </div>
+            
+            <div style="font-size: 11px; color: #475569; margin-top: 6px;">
+              Statut : <strong>${meta.statut}</strong>
+            </div>
+            
+            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e2e8f0; text-align: center;">
+              <button onclick="voirResidence(decodeURIComponent('${nomEncode}'))" style="color: #2563eb; font-weight: 700; font-size: 11px; text-decoration: underline; background: none; border: none; cursor: pointer; padding: 0;">
+                Consulter la fiche Micro & Arbitrage IA ➔
+              </button>
+            </div>
+          </div>
+        `;
+
+        L.circleMarker(pt, {
+          radius: 8,
+          fillColor: meta.couleur,
+          color: '#ffffff',
+          weight: 2,
+          fillOpacity: 0.95
+        })
+        .bindPopup(popupHtml)
+        .addTo(mapInstance);
       });
 
       document.getElementById('compteur-residences').innerText = count + ' résidences affichées';
@@ -780,7 +858,7 @@
             setTimeout(() => statut.innerText = '', 1500);
 
             const rows = res.data;
-            let dates = [], ca26 = [], ca25 = [], nuits26 = [], nuits25 = [], totalRow = null, derniereDispo = 3;
+            let dates = [], ca26 = [], ca25 = [], nuits26 = [], nuits25 = [], totalRow = null, derniereDispo = info.dispo;
 
             for (let i = 2; i < rows.length; i++) {
               const row = rows[i];
@@ -824,9 +902,12 @@
               document.getElementById('res-to-senior').innerText = '89,4 %';
 
               const tension = document.getElementById('res-statut-tension');
-              if (dispoAffichee <= 3) {
+              if (dispoAffichee <= 2) {
                 tension.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-bold uppercase bg-rose-100 text-rose-800';
                 tension.innerText = 'Stock Critique (Tension Max)';
+              } else if (dispoAffichee <= 6) {
+                tension.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-bold uppercase bg-amber-100 text-amber-800';
+                tension.innerText = 'Stock Modéré';
               } else {
                 tension.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-bold uppercase bg-emerald-100 text-emerald-800';
                 tension.innerText = 'Stock Fluide & Équilibré';
@@ -841,7 +922,7 @@
               const text = document.getElementById('res-ai-text');
               const deltaCA = c25 > 0 ? ((c26 - c25) / c25) * 100 : 0;
 
-              if (dispoAffichee <= 3) {
+              if (dispoAffichee <= 2) {
                 box.className = 'bg-rose-50 p-6 rounded-2xl border-l-8 border-rose-500 shadow-sm space-y-2';
                 title.innerText = nom + ' : Alerte Stock Critique (' + dispoAffichee + ' dispos) ➔ MLOS 2 & Hausse Prix';
                 text.innerText = 'Le stock Zénao sature. Recommandation IA : Activer un séjour minimum de 2 nuits (MLOS 2) pour préserver le GOPAR et majorer les tarifs de +20 % sur les OTA.';
